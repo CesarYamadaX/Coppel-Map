@@ -740,13 +740,13 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
         <input id="q" type="search" placeholder="Nombre, colonia, municipio o CP" autocomplete="off">
       </div>
       <div>
-        <label class="l" for="estado">Estado</label>
-        <select id="estado"><option value="">Todo México</option></select>
-      </div>
-      <div>
         <label class="l" for="region">Región Telcel</label>
         <select id="region"><option value="">Todas las regiones</option></select>
         <label class="tog" for="colorReg" style="margin-top:8px"><input type="checkbox" id="colorReg" checked> Colorear estados por región</label>
+      </div>
+      <div>
+        <label class="l" for="estado">Estado</label>
+        <select id="estado"><option value="">Todo México</option></select>
       </div>
       <div>
         <span class="l">Tipo de ubicación</span>
@@ -799,7 +799,11 @@ const norm=s=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
 const hay=D.map(r=>norm([r[0],r[1],r[2],r[3],r[4]].join(' ')));
 
 const states=[...new Set(D.map(r=>r[3]))].sort((a,b)=>a.localeCompare(b,'es'));
-states.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;stEl.appendChild(o)});
+const MULTI={'Coahuila':[3,4],'Sonora':[1,2],'Jalisco':[5,6]};const stRegs=s=>MULTI[s]||[SR[s]];
+function fillStates(){const keep=stEl.value;stEl.innerHTML='';const all=document.createElement('option');all.value='';all.textContent=rgEl.value?'Todos los estados de R'+rgEl.value:'Todo México';stEl.appendChild(all);
+  states.filter(s=>!rgEl.value||stRegs(s).includes(+rgEl.value)).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s+' ('+stRegs(s).map(k=>'R'+k).join('/')+')';stEl.appendChild(o)});
+  stEl.value=[...stEl.options].some(o=>o.value===keep)?keep:''}
+fillStates();
 
 const chips=document.getElementById('chips');
 TYPES.forEach((t,k)=>{const n=D.filter(r=>r[7]&(1<<k)).length;const b=document.createElement('button');b.className='chip';b.type='button';b.textContent=`${t} ${n.toLocaleString('es-MX')}`;b.setAttribute('aria-pressed',active.has(k));b.onclick=()=>{active.has(k)?active.delete(k):active.add(k);if(!active.size)active.add(k);b.setAttribute('aria-pressed',active.has(k));chips.querySelectorAll('.chip').forEach((c,j)=>c.setAttribute('aria-pressed',active.has(j)));update()};chips.appendChild(b)});
@@ -828,12 +832,12 @@ function update(fit){
     const b=document.createElement('button');b.type='button';
     if(groupBy==='state'){
       b.className='row'+(stEl.value===s?' on':'');
-      b.innerHTML=`<span>${esc(s)} <span class="rs" style="display:inline;margin:0">· R${SR[s]||''}</span></span><span class="n">${n.toLocaleString('es-MX')}</span><span class="bar" style="width:${(n/max*100).toFixed(1)}%"></span>`;
-      b.onclick=()=>{stEl.value=stEl.value===s?'':s;update(true)};
+      b.innerHTML=`<span>${esc(s)} <span class="rs" style="display:inline;margin:0">· ${stRegs(s).map(k=>'R'+k).join('/')}</span></span><span class="n">${n.toLocaleString('es-MX')}</span><span class="bar" style="width:${(n/max*100).toFixed(1)}%"></span>`;
+      b.onclick=()=>{if(stEl.value!==s&&rgEl.value&&SR[s]!=+rgEl.value){rgEl.value='';fillStates()}stEl.value=stEl.value===s?'':s;update(true)};
     }else{
       b.className='row'+(rgEl.value===s?' on':'');
       b.innerHTML=`<span><span class="sw" style="background:${RCOL[s]}"></span>Región ${s}<span class="rs">${esc(RNAME[s])}</span></span><span class="n">${n.toLocaleString('es-MX')}</span><span class="bar" style="width:${(n/max*100).toFixed(1)}%;background:${RCOL[s]}"></span>`;
-      b.onclick=()=>{rgEl.value=rgEl.value===s?'':s;stEl.value='';update(true)};
+      b.onclick=()=>{rgEl.value=rgEl.value===s?'':s;stEl.value='';fillStates();update(true)};
     }
     list.appendChild(b);
   });
@@ -846,7 +850,7 @@ function update(fit){
 }
 let tmr;qEl.addEventListener('input',()=>{clearTimeout(tmr);tmr=setTimeout(()=>update(true),200)});
 stEl.addEventListener('change',()=>update(true));
-rgEl.addEventListener('change',()=>update(true));
+rgEl.addEventListener('change',()=>{fillStates();update(true)});
 colorEl.addEventListener('change',()=>update());
 const bS=document.getElementById('byState'),bR=document.getElementById('byRegion');
 const setG=g=>{groupBy=g;bS.setAttribute('aria-pressed',g==='state');bR.setAttribute('aria-pressed',g==='region');update()};
