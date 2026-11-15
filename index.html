@@ -740,7 +740,7 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
         <input id="q" type="search" placeholder="Nombre, colonia, municipio o CP" autocomplete="off">
       </div>
       <div>
-        <label class="l" for="region">Región Telcel</label>
+        <label class="l" for="region">Región</label>
         <select id="region"><option value="">Todas las regiones</option></select>
         <label class="tog" for="colorReg" style="margin-top:8px"><input type="checkbox" id="colorReg" checked> Colorear estados por región</label>
       </div>
@@ -753,9 +753,9 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
         <div class="chips" id="chips"></div>
       </div>
     </div>
-    <div class="seg" role="group" aria-label="Agrupar conteo"><button type="button" id="byState" aria-pressed="true">Por estado</button><button type="button" id="byRegion" aria-pressed="false">Por región Telcel</button></div>
+    <div class="seg" role="group" aria-label="Agrupar conteo"><button type="button" id="byState" aria-pressed="true">Por estado</button><button type="button" id="byRegion" aria-pressed="false">Por región</button></div>
     <div class="list" id="list" aria-label="Conteo"></div>
-    <div class="src">Coordenadas exactas del pin en el localizador oficial. Regiones Telcel según las 9 regiones celulares del IFT; los municipios de excepción (La Laguna, San Luis Río Colorado y el norte de Jalisco) se asignan por tienda.</div>
+    <div class="src">Coordenadas exactas del pin en el localizador oficial. Regiones según las 9 regiones celulares del IFT (las que usa Telcel); los municipios de excepción (La Laguna, San Luis Río Colorado y el norte de Jalisco) se asignan por tienda.</div>
   </aside>
   <div id="map" role="application" aria-label="Mapa de tiendas"></div>
 </div>
@@ -790,7 +790,7 @@ const markers=D.map((r,i)=>{
   m.bindPopup(()=>{
     const t=TYPES.filter((_,k)=>r[7]&(1<<k)).join(' · ');
     const g='https://www.google.com/maps/search/?api=1&query='+r[5]+','+r[6];
-    return `<div class="pp"><b>${esc(r[0])}</b>${esc(r[1])}<br>${esc(r[2])}, ${esc(r[3])}, CP ${esc(r[4])}${r[8]?'<br>Tel. '+esc(r[8]):''}<div class="t">${esc(t)}</div><span class="rb" style="background:${RCOL[r[9]]}">Región Telcel R${r[9]}</span><div class="t">${r[5]}, ${r[6]} · <a href="${g}" target="_blank" rel="noopener">Abrir en Google Maps</a></div></div>`;
+    return `<div class="pp"><b>${esc(r[0])}</b>${esc(r[1])}<br>${esc(r[2])}, ${esc(r[3])}, CP ${esc(r[4])}${r[8]?'<br>Tel. '+esc(r[8]):''}<div class="t">${esc(t)}</div><span class="rb" style="background:${RCOL[r[9]]}">Región R${r[9]}</span><div class="t">${r[5]}, ${r[6]} · <a href="${g}" target="_blank" rel="noopener">Abrir en Google Maps</a></div></div>`;
   });
   m._i=i; return m;
 });
@@ -800,8 +800,8 @@ const hay=D.map(r=>norm([r[0],r[1],r[2],r[3],r[4]].join(' ')));
 
 const states=[...new Set(D.map(r=>r[3]))].sort((a,b)=>a.localeCompare(b,'es'));
 const MULTI={'Coahuila':[3,4],'Sonora':[1,2],'Jalisco':[5,6]};const stRegs=s=>MULTI[s]||[SR[s]];
-function fillStates(){const keep=stEl.value;stEl.innerHTML='';const all=document.createElement('option');all.value='';all.textContent=rgEl.value?'Todos los estados de R'+rgEl.value:'Todo México';stEl.appendChild(all);
-  states.filter(s=>!rgEl.value||stRegs(s).includes(+rgEl.value)).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s+' ('+stRegs(s).map(k=>'R'+k).join('/')+')';stEl.appendChild(o)});
+function fillStates(){const keep=stEl.value;stEl.innerHTML='';const all=document.createElement('option');all.value='';all.textContent='Todos los estados';stEl.appendChild(all);
+  states.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s+' ('+stRegs(s).map(k=>'R'+k).join('/')+')';stEl.appendChild(o)});
   stEl.value=[...stEl.options].some(o=>o.value===keep)?keep:''}
 fillStates();
 
@@ -833,11 +833,11 @@ function update(fit){
     if(groupBy==='state'){
       b.className='row'+(stEl.value===s?' on':'');
       b.innerHTML=`<span>${esc(s)} <span class="rs" style="display:inline;margin:0">· ${stRegs(s).map(k=>'R'+k).join('/')}</span></span><span class="n">${n.toLocaleString('es-MX')}</span><span class="bar" style="width:${(n/max*100).toFixed(1)}%"></span>`;
-      b.onclick=()=>{if(stEl.value!==s&&rgEl.value&&SR[s]!=+rgEl.value){rgEl.value='';fillStates()}stEl.value=stEl.value===s?'':s;update(true)};
+      b.onclick=()=>{stEl.value=stEl.value===s?'':s;update(true)};
     }else{
       b.className='row'+(rgEl.value===s?' on':'');
       b.innerHTML=`<span><span class="sw" style="background:${RCOL[s]}"></span>Región ${s}<span class="rs">${esc(RNAME[s])}</span></span><span class="n">${n.toLocaleString('es-MX')}</span><span class="bar" style="width:${(n/max*100).toFixed(1)}%;background:${RCOL[s]}"></span>`;
-      b.onclick=()=>{rgEl.value=rgEl.value===s?'':s;stEl.value='';fillStates();update(true)};
+      b.onclick=()=>{rgEl.value=rgEl.value===s?'':s;update(true)};
     }
     list.appendChild(b);
   });
@@ -850,7 +850,7 @@ function update(fit){
 }
 let tmr;qEl.addEventListener('input',()=>{clearTimeout(tmr);tmr=setTimeout(()=>update(true),200)});
 stEl.addEventListener('change',()=>update(true));
-rgEl.addEventListener('change',()=>{fillStates();update(true)});
+rgEl.addEventListener('change',()=>update(true));
 colorEl.addEventListener('change',()=>update());
 const bS=document.getElementById('byState'),bR=document.getElementById('byRegion');
 const setG=g=>{groupBy=g;bS.setAttribute('aria-pressed',g==='state');bR.setAttribute('aria-pressed',g==='region');update()};
