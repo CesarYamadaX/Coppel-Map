@@ -695,6 +695,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);
   --shadow-sm:0 1px 2px rgba(0,0,0,.4),0 3px 10px rgba(0,0,0,.35); color-scheme:dark}
 :root[data-theme="light"]{color-scheme:light}
+.osm-dark .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9)}
 
 *,*::before,*::after{box-sizing:border-box}
 html,body{height:100%;margin:0;overflow:hidden}
@@ -1043,7 +1044,7 @@ h1{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:-.01
 </aside>
 
 <div class="ctrls">
-  <div class="seg base float" role="group" aria-label="Mapa base"><button type="button" id="baseSimple" aria-pressed="false">Simple</button><button type="button" id="baseCalles" aria-pressed="true">Calles</button></div>
+  <div class="seg base float" hidden style="display:none" role="group" aria-label="Mapa base"><button type="button" id="baseSimple" aria-pressed="false">Simple</button><button type="button" id="baseCalles" aria-pressed="true">Calles</button></div>
   <div class="stack float" role="group" aria-label="Zoom">
     <button type="button" id="zin" aria-label="Acercar" title="Acercar"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
     <button type="button" id="zout" aria-label="Alejar" title="Alejar"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
@@ -1497,17 +1498,18 @@ $('legendBtn').addEventListener('click',()=>legendOpen($('legendBody').hidden));
 
 /* ── mapa base y tema ── */
 let tiles=null, tOk=0, tErr=0, baseAuto=false;
-const tileURL=()=>'https://{s}.basemaps.cartocdn.com/'+(isDark()?'dark_all':'light_all')+'/{z}/{x}/{y}{r}.png';
+const tileURL=()=>'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const tintTiles=()=>map.getContainer().classList.toggle('osm-dark',isDark());
 function setBase(b,auto){
   S.base=b;baseAuto=!!auto;root.setAttribute('data-base',b);
   $('baseSimple').setAttribute('aria-pressed',b==='simple');$('baseCalles').setAttribute('aria-pressed',b==='calles');
   if(b==='calles'){
     if(!tiles){
-      tiles=L.tileLayer(tileURL(),{subdomains:'abcd',maxZoom:20,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
+      tiles=L.tileLayer(tileURL(),{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'});
       tiles.on('tileload',()=>tOk++);
       tiles.on('tileerror',()=>{tErr++;if(!tOk&&tErr>=4&&S.base==='calles'){const quiet=baseAuto;setBase('simple',true);if(!quiet)toast('No se pudo cargar el mapa de calles; se muestra el mapa simple.')}});
     }
-    tOk=0;tErr=0;tiles.addTo(map);
+    tOk=0;tErr=0;tiles.addTo(map);tintTiles();
   }else if(tiles)tiles.remove();
   stateLayer.setStyle(stStyle);if(!auto)store.set('base',b);
 }
@@ -1518,7 +1520,7 @@ function restyle(){
   tb.innerHTML=d?ICON.sun:ICON.moon;tb.setAttribute('aria-label',d?'Cambiar a modo claro':'Cambiar a modo oscuro');
   stateLayer.setStyle(stStyle);
   markers.forEach((m,i)=>m.setStyle(mStyle(i)));
-  if(tiles)tiles.setUrl(tileURL());
+  tintTiles();
   if(meDot)meDot.setStyle({fillColor:css('--me')});
   placeRing();
 }
@@ -1562,7 +1564,7 @@ legendOpen(!isMobile());
 setSnap('collapsed');
 restyle();
 // por defecto, calles; si los mosaicos no cargan se vuelve al mapa simple sin avisar
-{const sb=store.get('base');if(sb==='simple'||sb==='calles')setBase(sb);else setBase('calles',true)}
+setBase('simple',true);map.setMaxBounds(MX.pad(.25));
 update(false);
 fit();
 addEventListener('hashchange',()=>{if(location.hash.replace(/^#/,'')===lastHash)return;readHash();qEl.value=S.q;update(true)});
