@@ -17,7 +17,7 @@ ssh -R 80:localhost:8001 nokey@localhost.run
 
 ## CAPA (ventas por tienda desde SQL)
 
-Al dar click en una tienda Coppel, la ficha pide `/api/capa` y muestra las unidades vendidas (sell-out, todas las marcas) de los últimos 7, 30 y 365 días hasta el último día con datos en `[GTM BI Database].dbo.B2BHonorGeneralReport`.
+Al dar click en una tienda Coppel, la ficha pide `/api/capa` y muestra las unidades vendidas (sell-out, todas las marcas) de los últimos 7, 30 y 365 días y de la semana ISO (lun–dom) y el mes en curso, hasta el último día con datos en `[GTM BI Database].dbo.B2BHonorGeneralReport`.
 
 Requiere `pip install pyodbc` y la cadena ODBC en la variable `COPPEL_SQL` o en `acceso/sql.txt` (en `.gitignore`: **no la subas**), por ejemplo:
 

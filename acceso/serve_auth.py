@@ -66,12 +66,20 @@ CAPA_SQL = """
 SELECT LEFT(r.Store, CHARINDEX(' ', r.Store + ' ') - 1) num, MIN(r.Store) nombre,
        SUM(CASE WHEN r.Date > DATEADD(day, -7, m.mx) THEN r.Qty ELSE 0 END) semana,
        SUM(CASE WHEN r.Date > DATEADD(day, -30, m.mx) THEN r.Qty ELSE 0 END) mes,
-       SUM(r.Qty) ano, CONVERT(char(10), m.mx, 23) hasta
+       SUM(r.Qty) ano,
+       SUM(CASE WHEN r.Date >= m.ws THEN r.Qty ELSE 0 END) semana_cal,
+       SUM(CASE WHEN r.Date >= m.ms THEN r.Qty ELSE 0 END) mes_cal,
+       CONVERT(char(10), m.mx, 23) hasta, CONVERT(char(10), m.ws, 23) ini_sem,
+       CONVERT(char(10), m.ms, 23) ini_mes, m.isow
 FROM [GTM BI Database].dbo.B2BHonorGeneralReport r WITH (NOLOCK)
-CROSS JOIN (SELECT MAX(Date) mx FROM [GTM BI Database].dbo.B2BHonorGeneralReport WITH (NOLOCK)
-            WHERE Retail = 'Coppel' AND DATA_TYPE = 'SO') m
+-- ws = lunes de la semana ISO del corte (el domingo cuenta en la semana que termina),
+-- independiente de @@DATEFIRST; ms = día 1 del mes del corte.
+CROSS JOIN (SELECT mx, DATEADD(day, -((DATEPART(weekday, mx) + @@DATEFIRST - 2) % 7), mx) ws,
+                   DATEFROMPARTS(YEAR(mx), MONTH(mx), 1) ms, DATEPART(ISO_WEEK, mx) isow
+            FROM (SELECT CAST(MAX(Date) AS date) mx FROM [GTM BI Database].dbo.B2BHonorGeneralReport WITH (NOLOCK)
+                  WHERE Retail = 'Coppel' AND DATA_TYPE = 'SO') x) m
 WHERE r.Retail = 'Coppel' AND r.DATA_TYPE = 'SO' AND r.Date > DATEADD(day, -365, m.mx) AND ({filtro})
-GROUP BY LEFT(r.Store, CHARINDEX(' ', r.Store + ' ') - 1), m.mx
+GROUP BY LEFT(r.Store, CHARINDEX(' ', r.Store + ' ') - 1), m.mx, m.ws, m.ms, m.isow
 """
 capa_cache = {}  # "36,1111" -> (expira, resultado)
 
@@ -105,14 +113,18 @@ def capa(t):
     except Exception:
         return {"error": "No se pudo consultar SQL."}
     by = {r.num: r for r in rows}
-    hasta = rows[0].hasta if rows else None
+    f = rows[0] if rows else None
     tiendas = []
     for n in nums:
         r = by.get(n)
         nombre = r.nombre.split(" ", 1)[1].lstrip("•· ").strip() if r and " " in r.nombre else ""
-        tiendas.append({"num": n, "nombre": nombre, "semana": int(r.semana) if r else 0,
-                        "mes": int(r.mes) if r else 0, "ano": int(r.ano) if r else 0})
-    out = {"tiendas": tiendas, "hasta": hasta}  # None si no hubo ventas en 365 días
+        t = {"num": n, "nombre": nombre}
+        for k in ("semana", "mes", "ano", "semana_cal", "mes_cal"):
+            t[k] = int(getattr(r, k) or 0) if r else 0
+        tiendas.append(t)
+    # fechas en None si no hubo ventas en 365 días
+    out = {"tiendas": tiendas, "hasta": f and f.hasta, "ini_sem": f and f.ini_sem,
+           "ini_mes": f and f.ini_mes, "isow": f and int(f.isow)}
     with lock:
         capa_cache[key] = (time.time() + 1800, out)
     return out

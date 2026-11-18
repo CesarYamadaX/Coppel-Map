@@ -908,6 +908,8 @@ h1{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:-.01
 .capa-g div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:5px 7px}
 .capa-g span{display:block;color:var(--muted);font-size:10.5px}
 .capa-g strong{font-size:15px;font-variant-numeric:tabular-nums}
+.capa-g em{display:block;font-style:normal;color:var(--muted);font-size:10px}
+.capa-cal{grid-template-columns:repeat(2,1fr);margin-top:6px}
 .leaflet-popup-content .capa-msg{display:block;margin:6px 0 0;color:var(--muted);font-size:11px}
 .pp-act{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-weight:600;font-size:12.5px;text-decoration:none;white-space:nowrap}
@@ -1245,9 +1247,14 @@ const capaCache=new Map();
 const fdate=s=>new Date(s+'T00:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
 function capaHTML(d){
   if(d.error)return `<span class="capa-msg">${esc(d.error)}</span>`;
-  const rows=d.tiendas.map(t=>`<div class="capa-t">${d.tiendas.length>1?`<b>#${esc(t.num)} ${esc(t.nombre)}</b>`:''}<div class="capa-g">${[['Semana',t.semana],['Mes',t.mes],['Año',t.ano]].map(([k,v])=>`<div><span>${k}</span><strong>${fmt(v||0)}</strong></div>`).join('')}</div></div>`).join('');
+  const cell=([k,v,sub])=>`<div><span>${k}</span><strong>${fmt(v||0)}</strong>${sub?`<em>${sub}</em>`:''}</div>`;
+  const dd=s=>new Date(s+'T00:00:00');
+  const dm=x=>x.toLocaleDateString('es-MX',{day:'numeric',month:'short'});
+  const rng=(a,b)=>{const x=dd(a),y=dd(b);return `${x.getMonth()===y.getMonth()?x.getDate():dm(x)}–${dm(y)}`};
+  const mesN=d.ini_mes?dd(d.ini_mes).toLocaleDateString('es-MX',{month:'long'}):'';
+  const rows=d.tiendas.map(t=>`<div class="capa-t">${d.tiendas.length>1?`<b>#${esc(t.num)} ${esc(t.nombre)}</b>`:''}<div class="capa-g">${[['7 días',t.semana],['30 días',t.mes],['365 días',t.ano]].map(cell).join('')}</div>${d.hasta?`<div class="capa-g capa-cal">${[['Semana W'+d.isow,t.semana_cal,rng(d.ini_sem,d.hasta)],[mesN[0].toUpperCase()+mesN.slice(1),t.mes_cal,rng(d.ini_mes,d.hasta)]].map(cell).join('')}</div>`:''}</div>`).join('');
   const one=d.tiendas.length===1?` · #${esc(d.tiendas[0].num)} ${esc(d.tiendas[0].nombre)}`:'';
-  return `<div class="capa-h">CAPA <small>unidades vendidas${one}</small></div>${d.tiendas.length>1?'<p class="capa-msg">Varias tiendas con este nombre en el estado; revisa cuál es:</p>':''}${rows}<p class="capa-msg">${d.hasta?`Últimos 7, 30 y 365 días al ${fdate(d.hasta)}.`:'Sin ventas en los últimos 365 días.'}</p>`;
+  return `<div class="capa-h">CAPA <small>unidades vendidas${one}</small></div>${d.tiendas.length>1?'<p class="capa-msg">Varias tiendas con este nombre en el estado; revisa cuál es:</p>':''}${rows}<p class="capa-msg">${d.hasta?`Arriba: días móviles al ${fdate(d.hasta)}. Abajo: semana ISO (lun–dom) y mes en curso hasta esa fecha.`:'Sin ventas en los últimos 365 días.'}</p>`;
 }
 function loadCapa(i){
   const t=SN[i];
