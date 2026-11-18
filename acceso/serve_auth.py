@@ -63,7 +63,7 @@ def try_login(user, code):
 # Cadena ODBC en la variable COPPEL_SQL o en acceso/sql.txt (en .gitignore: no la subas).
 SQL_FILE = os.path.join(HERE, "sql.txt")
 CAPA_SQL = """
-SELECT LEFT(r.Store, CHARINDEX(' ', r.Store + ' ') - 1) num, MIN(r.Store) nombre,
+SELECT c.num, MIN(c.nombre) nombre,
        SUM(CASE WHEN r.Date > DATEADD(day, -7, m.mx) THEN r.Qty ELSE 0 END) semana,
        SUM(CASE WHEN r.Date > DATEADD(day, -30, m.mx) THEN r.Qty ELSE 0 END) mes,
        SUM(r.Qty) ano,
@@ -72,14 +72,18 @@ SELECT LEFT(r.Store, CHARINDEX(' ', r.Store + ' ') - 1) num, MIN(r.Store) nombre
        CONVERT(char(10), m.mx, 23) hasta, CONVERT(char(10), m.ws, 23) ini_sem,
        CONVERT(char(10), m.ms, 23) ini_mes, m.isow
 FROM [GTM BI Database].dbo.B2BHonorGeneralReport r WITH (NOLOCK)
+-- número de tienda -> ID (APSMX…) con el catálogo; las ventas se filtran por ID
+JOIN (SELECT ID, [Coppel Name] nombre, LEFT([Coppel Name], CHARINDEX(' ', [Coppel Name] + ' ') - 1) num
+      FROM [GTM BI Database].dbo.CustomerStores_VW
+      WHERE RetailName = 'COPPEL' AND ({filtro})) c ON c.ID = r.ID
 -- ws = lunes de la semana ISO del corte (el domingo cuenta en la semana que termina),
 -- independiente de @@DATEFIRST; ms = día 1 del mes del corte.
 CROSS JOIN (SELECT mx, DATEADD(day, -((DATEPART(weekday, mx) + @@DATEFIRST - 2) % 7), mx) ws,
                    DATEFROMPARTS(YEAR(mx), MONTH(mx), 1) ms, DATEPART(ISO_WEEK, mx) isow
             FROM (SELECT CAST(MAX(Date) AS date) mx FROM [GTM BI Database].dbo.B2BHonorGeneralReport WITH (NOLOCK)
                   WHERE Retail = 'Coppel' AND DATA_TYPE = 'SO') x) m
-WHERE r.Retail = 'Coppel' AND r.DATA_TYPE = 'SO' AND r.Date > DATEADD(day, -365, m.mx) AND ({filtro})
-GROUP BY LEFT(r.Store, CHARINDEX(' ', r.Store + ' ') - 1), m.mx, m.ws, m.ms, m.isow
+WHERE r.Retail = 'Coppel' AND r.DATA_TYPE = 'SO' AND r.Date > DATEADD(day, -365, m.mx)
+GROUP BY c.num, m.mx, m.ws, m.ms, m.isow
 """
 capa_cache = {}  # "36,1111" -> (expira, resultado)
 
@@ -108,7 +112,7 @@ def capa(t):
         import pyodbc
         with pyodbc.connect(cs, timeout=10) as cn:
             cur = cn.cursor()
-            cur.execute(CAPA_SQL.format(filtro=" OR ".join(["r.Store LIKE ?"] * len(nums))), [n + " %" for n in nums])
+            cur.execute(CAPA_SQL.format(filtro=" OR ".join(["[Coppel Name] LIKE ?"] * len(nums))), [n + " %" for n in nums])
             rows = cur.fetchall()
     except Exception:
         return {"error": "No se pudo consultar SQL."}
