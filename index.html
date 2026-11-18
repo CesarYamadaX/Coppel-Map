@@ -906,11 +906,14 @@ h1{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:-.01
 .capa-t b{display:block;font-size:11.5px;margin-bottom:3px}
 .capa-g{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .capa-g div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:5px 7px}
-.capa-g span{display:block;color:var(--muted);font-size:10.5px}
+.capa-g span{display:block;color:var(--fg);font-weight:700;font-size:10.5px;line-height:1.2}
+.capa-sec{margin:8px 0 4px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--fg)}
+.capa-sec span{text-transform:none;letter-spacing:0;font-weight:500;color:var(--muted)}
+.capa-t>b+.capa-sec{margin-top:2px}
 .capa-g strong{font-size:15px;font-variant-numeric:tabular-nums}
 .capa-g em{display:block;font-style:normal;color:var(--muted);font-size:10px}
 .capa-g .capa-h-share{display:block;white-space:nowrap;font-style:normal;font-weight:600;font-size:10px;color:var(--accent);font-variant-numeric:tabular-nums}
-.capa-cal{grid-template-columns:repeat(2,1fr);margin-top:6px}
+.capa-cal{grid-template-columns:repeat(2,1fr)}
 .leaflet-popup-content .capa-msg{display:block;margin:6px 0 0;color:var(--muted);font-size:11px}
 .pp-act{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--fg);font-weight:600;font-size:12.5px;text-decoration:none;white-space:nowrap}
@@ -1254,9 +1257,10 @@ function capaHTML(d){
   const dm=x=>x.toLocaleDateString('es-MX',{day:'numeric',month:'short'});
   const rng=(a,b)=>{const x=dd(a),y=dd(b);return `${x.getMonth()===y.getMonth()?x.getDate():dm(x)}–${dm(y)}`};
   const mesN=d.ini_mes?dd(d.ini_mes).toLocaleDateString('es-MX',{month:'long'}):'';
-  const rows=d.tiendas.map(t=>`<div class="capa-t">${d.tiendas.length>1?`<b>#${esc(t.num)} ${esc(t.nombre)}</b>`:''}<div class="capa-g">${[['7 días',t.semana,t.h_semana],['30 días',t.mes,t.h_mes],['365 días',t.ano,t.h_ano]].map(cell).join('')}</div>${d.hasta?`<div class="capa-g capa-cal">${[['Semana W'+d.isow,t.semana_cal,t.h_semana_cal,rng(d.ini_sem,d.hasta)],[mesN[0].toUpperCase()+mesN.slice(1),t.mes_cal,t.h_mes_cal,rng(d.ini_mes,d.hasta)]].map(cell).join('')}</div>`:''}</div>`).join('');
+  const sec=s=>`<div class="capa-sec">${s}</div>`;
+  const rows=d.tiendas.map(t=>`<div class="capa-t">${d.tiendas.length>1?`<b>#${esc(t.num)} ${esc(t.nombre)}</b>`:''}${d.hasta?sec(`Últimos días <span>· al ${fdate(d.hasta)}</span>`):''}<div class="capa-g">${[['Últimos 7 días',t.semana,t.h_semana],['Últimos 30 días',t.mes,t.h_mes],['Últimos 365 días',t.ano,t.h_ano]].map(cell).join('')}</div>${d.hasta?`${sec('Calendario en curso <span>· semana lun–dom</span>')}<div class="capa-g capa-cal">${[['Semana W'+d.isow,t.semana_cal,t.h_semana_cal,rng(d.ini_sem,d.hasta)],['Mes de '+mesN,t.mes_cal,t.h_mes_cal,rng(d.ini_mes,d.hasta)]].map(cell).join('')}</div>`:''}</div>`).join('');
   const one=d.tiendas.length===1?` · #${esc(d.tiendas[0].num)} ${esc(d.tiendas[0].nombre)}`:'';
-  return `<div class="capa-h">CAPA <small>unidades vendidas y % Honor${one}</small></div>${d.tiendas.length>1?'<p class="capa-msg">Varias tiendas con este nombre en el estado; revisa cuál es:</p>':''}${rows}<p class="capa-msg">${d.hasta?`Arriba: días móviles al ${fdate(d.hasta)}. Abajo: semana ISO (lun–dom) y mes en curso hasta esa fecha.`:'Sin ventas en los últimos 365 días.'}</p>`;
+  return `<div class="capa-h">CAPA <small>unidades vendidas y % Honor${one}</small></div>${d.tiendas.length>1?'<p class="capa-msg">Varias tiendas con este nombre en el estado; revisa cuál es:</p>':''}${rows}${d.hasta?'':'<p class="capa-msg">Sin ventas en los últimos 365 días.</p>'}`;
 }
 function loadCapa(i){
   const t=SN[i];
