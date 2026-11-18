@@ -59,6 +59,65 @@ def try_login(user, code):
     return good
 
 
+# ── CAPA: ventas (unidades sell-out) por tienda Coppel desde SQL Server ──
+# Cadena ODBC en la variable COPPEL_SQL o en acceso/sql.txt (en .gitignore: no la subas).
+SQL_FILE = os.path.join(HERE, "sql.txt")
+CAPA_SQL = """
+SELECT LEFT(r.Store, CHARINDEX(' ', r.Store + ' ') - 1) num, MIN(r.Store) nombre,
+       SUM(CASE WHEN r.Date > DATEADD(day, -7, m.mx) THEN r.Qty ELSE 0 END) semana,
+       SUM(CASE WHEN r.Date > DATEADD(day, -30, m.mx) THEN r.Qty ELSE 0 END) mes,
+       SUM(r.Qty) ano, CONVERT(char(10), m.mx, 23) hasta
+FROM [GTM BI Database].dbo.B2BHonorGeneralReport r WITH (NOLOCK)
+CROSS JOIN (SELECT MAX(Date) mx FROM [GTM BI Database].dbo.B2BHonorGeneralReport WITH (NOLOCK)
+            WHERE Retail = 'Coppel' AND DATA_TYPE = 'SO') m
+WHERE r.Retail = 'Coppel' AND r.DATA_TYPE = 'SO' AND r.Date > DATEADD(day, -365, m.mx) AND ({filtro})
+GROUP BY LEFT(r.Store, CHARINDEX(' ', r.Store + ' ') - 1), m.mx
+"""
+capa_cache = {}  # "36,1111" -> (expira, resultado)
+
+
+def sql_conn_str():
+    s = os.environ.get("COPPEL_SQL", "").strip()
+    if not s and os.path.exists(SQL_FILE):
+        with open(SQL_FILE, encoding="utf-8") as f:
+            s = f.read().strip()
+    return s
+
+
+def capa(t):
+    nums = [n for n in t.split(",") if n.isdigit() and len(n) <= 5][:3]
+    if not nums:
+        return {"error": "Tienda no válida."}
+    key = ",".join(nums)
+    with lock:
+        hit = capa_cache.get(key)
+    if hit and hit[0] > time.time():
+        return hit[1]
+    cs = sql_conn_str()
+    if not cs:
+        return {"error": "Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt)."}
+    try:
+        import pyodbc
+        with pyodbc.connect(cs, timeout=10) as cn:
+            cur = cn.cursor()
+            cur.execute(CAPA_SQL.format(filtro=" OR ".join(["r.Store LIKE ?"] * len(nums))), [n + " %" for n in nums])
+            rows = cur.fetchall()
+    except Exception:
+        return {"error": "No se pudo consultar SQL."}
+    by = {r.num: r for r in rows}
+    hasta = rows[0].hasta if rows else None
+    tiendas = []
+    for n in nums:
+        r = by.get(n)
+        nombre = r.nombre.split(" ", 1)[1].lstrip("•· ").strip() if r and " " in r.nombre else ""
+        tiendas.append({"num": n, "nombre": nombre, "semana": int(r.semana) if r else 0,
+                        "mes": int(r.mes) if r else 0, "ano": int(r.ano) if r else 0})
+    out = {"tiendas": tiendas, "hasta": hasta}  # None si no hubo ventas en 365 días
+    with lock:
+        capa_cache[key] = (time.time() + 1800, out)
+    return out
+
+
 PAGE = """<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
 <title>Coppel Map</title>
 <style>
@@ -93,8 +152,22 @@ class Auth(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def json_out(self, obj):
+        body = json.dumps(obj, ensure_ascii=False).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_GET(self):
         p = self.path.split("?", 1)[0].lower()
+        if p == "/api/capa":
+            if not self.authed():
+                return self.page(401)
+            q = parse_qs(self.path.partition("?")[2]).get("t", [""])[0]
+            return self.json_out(capa(q))
         if p.startswith("/acceso") or p.endswith("totp.json") or "/qr/" in p:
             self.send_response(404)  # nunca servir scripts, claves ni QR
             self.send_header("Content-Length", "0")

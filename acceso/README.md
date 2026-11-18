@@ -15,6 +15,16 @@ python acceso/serve_auth.py . 8001
 ssh -R 80:localhost:8001 nokey@localhost.run
 ```
 
+## CAPA (ventas por tienda desde SQL)
+
+Al dar click en una tienda Coppel, la ficha pide `/api/capa` y muestra las unidades vendidas (sell-out, todas las marcas) de los últimos 7, 30 y 365 días hasta el último día con datos en `[GTM BI Database].dbo.B2BHonorGeneralReport`.
+
+Requiere `pip install pyodbc` y la cadena ODBC en la variable `COPPEL_SQL` o en `acceso/sql.txt` (en `.gitignore`: **no la subas**), por ejemplo:
+
+```
+DRIVER={ODBC Driver 18 for SQL Server};SERVER=host;UID=usuario;PWD=clave;TrustServerCertificate=yes
+```
+
 ## Notas
 
 - Las claves se guardan en `totp.json` y los QR en `qr/`. Ambos están en `.gitignore`: **no los subas**.
