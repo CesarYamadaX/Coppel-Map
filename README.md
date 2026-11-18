@@ -2,14 +2,14 @@
 
 Mapa interactivo de las tiendas Coppel en México, con los datos del localizador oficial de coppel.com (consultado el 13 de noviembre de 2026).
 
-- **1,709 tiendas Coppel** en los 32 estados.
-- **2,480 ubicaciones** en total, contando cajeros, BanCoppel, Afore Coppel, Coppel Canadá, Motos, Bodega y Fashion Market.
+- **1,733 ubicaciones** se ven por defecto en el mapa en los 32 estados: las 1,709 tiendas Coppel del localizador y 24 tiendas que ya no venden (puntos rojos, filtro «Sin ventas»).
+- **2,504 ubicaciones** en total en el mapa, contando cajeros, BanCoppel, Afore Coppel, Coppel Canadá, Motos, Bodega, Fashion Market y las 24 sin ventas. Los CSV de `data/` siguen con las 1,709 tiendas y 2,480 ubicaciones del localizador.
 
 ## Contenido
 
 | Archivo | Qué es |
 | --- | --- |
-| `index.html` | Mapa interactivo (Leaflet) a pantalla completa, en un solo archivo. Panel flotante en escritorio y hoja inferior deslizable en móvil; buscador con sugerencias (nombre, colonia, municipio, estado o CP; tecla `/`), filtros por región Telcel (R1 a R9), estado y tipo de ubicación, con píldoras de filtros activos y botón para limpiarlos. Pestañas «Resumen» (conteo por estado o por región) y «Ubicaciones» (lista de lo visible, ordenable por cercanía con «Mi ubicación»). Mapa base «Calles» (CARTO/OpenStreetMap) o «Simple» (solo estados coloreados por región), modo claro y oscuro, leyenda plegable y fichas con teléfono, «Cómo llegar», copiar dirección y enlace a la ficha oficial. Los filtros se guardan en la URL (`#r=5&e=Jalisco&q=...`) para compartir la vista. Las sucursales y cajeros BanCoppel que el localizador trae sin tipo (601 ubicaciones) se clasifican por su nombre, así que ya aparecen en el mapa. Ábrelo en el navegador o publícalo con GitHub Pages. |
+| `index.html` | Mapa interactivo (Leaflet) a pantalla completa, en un solo archivo. Panel flotante en escritorio y hoja inferior deslizable en móvil; buscador con sugerencias (nombre, colonia, municipio, estado o CP; tecla `/`), filtros por región Telcel (R1 a R9), estado y tipo de ubicación, con píldoras de filtros activos y botón para limpiarlos. Pestañas «Resumen» (conteo por estado o por región) y «Ubicaciones» (lista de lo visible, ordenable por cercanía con «Mi ubicación»). Mapa base propio, solo de México (estados coloreados por región, sin mosaicos externos), modo claro y oscuro, leyenda plegable y fichas con teléfono, «Cómo llegar», copiar dirección y enlace a la ficha oficial. Los filtros se guardan en la URL (`#r=5&e=Jalisco&q=...`) para compartir la vista. Las sucursales y cajeros BanCoppel que el localizador trae sin tipo (601 ubicaciones) se clasifican por su nombre, así que ya aparecen en el mapa. Ábrelo en el navegador o publícalo con GitHub Pages. |
 | `data/tiendas_coppel_oficial.csv` | Las 1,709 tiendas: name, address, municipality, state, postal_code, lat, lon, tipos, phone, location_id, url. |
 | `data/coppel_todas_ubicaciones_oficial.csv` | Las 2,480 ubicaciones, con una columna 0/1 por tipo (`es_tiendas_coppel`, `es_cajero`, etc.). |
 | `data/conteo_por_estado.csv` | Número de tiendas Coppel por estado. |
