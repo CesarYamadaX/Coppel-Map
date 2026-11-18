@@ -68,7 +68,13 @@ SELECT c.num, MIN(c.nombre) nombre,
        SUM(CASE WHEN r.Date > DATEADD(day, -30, m.mx) THEN r.Qty ELSE 0 END) mes,
        SUM(r.Qty) ano,
        SUM(CASE WHEN r.Date >= m.ws THEN r.Qty ELSE 0 END) semana_cal,
-       SUM(CASE WHEN r.Date >= m.ms THEN r.Qty ELSE 0 END) mes_cal
+       SUM(CASE WHEN r.Date >= m.ms THEN r.Qty ELSE 0 END) mes_cal,
+       -- unidades Honor en los mismos periodos (market share = Honor / total)
+       SUM(CASE WHEN r.Brand = 'HONOR' AND r.Date > DATEADD(day, -7, m.mx) THEN r.Qty ELSE 0 END) h_semana,
+       SUM(CASE WHEN r.Brand = 'HONOR' AND r.Date > DATEADD(day, -30, m.mx) THEN r.Qty ELSE 0 END) h_mes,
+       SUM(CASE WHEN r.Brand = 'HONOR' THEN r.Qty ELSE 0 END) h_ano,
+       SUM(CASE WHEN r.Brand = 'HONOR' AND r.Date >= m.ws THEN r.Qty ELSE 0 END) h_semana_cal,
+       SUM(CASE WHEN r.Brand = 'HONOR' AND r.Date >= m.ms THEN r.Qty ELSE 0 END) h_mes_cal
 FROM [GTM BI Database].dbo.B2BHonorGeneralReport r WITH (NOLOCK)
 -- número de tienda -> ID (APSMX…) con el catálogo; las ventas se filtran por ID
 JOIN (SELECT ID, [Coppel Name] nombre, LEFT([Coppel Name], CHARINDEX(' ', [Coppel Name] + ' ') - 1) num
@@ -137,6 +143,7 @@ def capa(t):
         t = {"num": n, "nombre": nombre}
         for k in ("semana", "mes", "ano", "semana_cal", "mes_cal"):
             t[k] = int(getattr(r, k) or 0) if r else 0
+            t["h_" + k] = int(getattr(r, "h_" + k) or 0) if r else 0
         tiendas.append(t)
     # fechas en None si no hubo ventas en 365 días
     out = {"tiendas": tiendas, "hasta": None, "ini_sem": None, "ini_mes": None, "isow": None}
