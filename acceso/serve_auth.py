@@ -1,4 +1,4 @@
-import base64, hashlib, hmac, html, json, os, secrets, struct, sys, threading, time
+import base64, datetime, hashlib, hmac, html, json, os, secrets, struct, sys, threading, time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from functools import partial
 from urllib.parse import parse_qs
@@ -68,24 +68,35 @@ SELECT c.num, MIN(c.nombre) nombre,
        SUM(CASE WHEN r.Date > DATEADD(day, -30, m.mx) THEN r.Qty ELSE 0 END) mes,
        SUM(r.Qty) ano,
        SUM(CASE WHEN r.Date >= m.ws THEN r.Qty ELSE 0 END) semana_cal,
-       SUM(CASE WHEN r.Date >= m.ms THEN r.Qty ELSE 0 END) mes_cal,
-       CONVERT(char(10), m.mx, 23) hasta, CONVERT(char(10), m.ws, 23) ini_sem,
-       CONVERT(char(10), m.ms, 23) ini_mes, m.isow
+       SUM(CASE WHEN r.Date >= m.ms THEN r.Qty ELSE 0 END) mes_cal
 FROM [GTM BI Database].dbo.B2BHonorGeneralReport r WITH (NOLOCK)
 -- número de tienda -> ID (APSMX…) con el catálogo; las ventas se filtran por ID
 JOIN (SELECT ID, [Coppel Name] nombre, LEFT([Coppel Name], CHARINDEX(' ', [Coppel Name] + ' ') - 1) num
       FROM [GTM BI Database].dbo.CustomerStores_VW
       WHERE RetailName = 'COPPEL' AND ({filtro})) c ON c.ID = r.ID
--- ws = lunes de la semana ISO del corte (el domingo cuenta en la semana que termina),
--- independiente de @@DATEFIRST; ms = día 1 del mes del corte.
-CROSS JOIN (SELECT mx, DATEADD(day, -((DATEPART(weekday, mx) + @@DATEFIRST - 2) % 7), mx) ws,
-                   DATEFROMPARTS(YEAR(mx), MONTH(mx), 1) ms, DATEPART(ISO_WEEK, mx) isow
-            FROM (SELECT CAST(MAX(Date) AS date) mx FROM [GTM BI Database].dbo.B2BHonorGeneralReport WITH (NOLOCK)
-                  WHERE Retail = 'Coppel' AND DATA_TYPE = 'SO') x) m
+-- fechas de corte calculadas en Python (ver cortes()); se pasan como parámetros date
+CROSS JOIN (SELECT CAST(? AS date) mx, CAST(? AS date) ws, CAST(? AS date) ms) m
 WHERE r.Retail = 'Coppel' AND r.DATA_TYPE = 'SO' AND r.Date > DATEADD(day, -365, m.mx)
-GROUP BY c.num, m.mx, m.ws, m.ms, m.isow
+GROUP BY c.num
 """
+MAX_SQL = """SELECT CAST(MAX(Date) AS date) FROM [GTM BI Database].dbo.B2BHonorGeneralReport WITH (NOLOCK)
+WHERE Retail = 'Coppel' AND DATA_TYPE = 'SO'"""
 capa_cache = {}  # "36,1111" -> (expira, resultado)
+mx_cache = [0, None]  # [expira, último día con ventas]: recorrer la tabla para el MAX cuesta ~la mitad de cada consulta
+
+
+def cortes(cur):
+    """Último día con ventas (en caché 30 min), lunes de su semana ISO y día 1 de su mes."""
+    with lock:
+        exp, mx = mx_cache
+    if not mx or exp < time.time():
+        mx = cur.execute(MAX_SQL).fetchone()[0]
+        if isinstance(mx, str):
+            mx = datetime.date.fromisoformat(mx[:10])
+        with lock:
+            mx_cache[:] = [time.time() + 1800, mx]
+    # weekday(): lunes=0 … domingo=6, así el domingo cae en la semana que termina (ISO)
+    return mx, mx - datetime.timedelta(days=mx.weekday()), mx.replace(day=1)
 
 
 def sql_conn_str():
@@ -112,12 +123,13 @@ def capa(t):
         import pyodbc
         with pyodbc.connect(cs, timeout=10) as cn:
             cur = cn.cursor()
-            cur.execute(CAPA_SQL.format(filtro=" OR ".join(["[Coppel Name] LIKE ?"] * len(nums))), [n + " %" for n in nums])
+            mx, ws, ms = cortes(cur)
+            cur.execute(CAPA_SQL.format(filtro=" OR ".join(["[Coppel Name] LIKE ?"] * len(nums))),
+                        [n + " %" for n in nums] + [mx, ws, ms])
             rows = cur.fetchall()
     except Exception:
         return {"error": "No se pudo consultar SQL."}
     by = {r.num: r for r in rows}
-    f = rows[0] if rows else None
     tiendas = []
     for n in nums:
         r = by.get(n)
@@ -127,8 +139,9 @@ def capa(t):
             t[k] = int(getattr(r, k) or 0) if r else 0
         tiendas.append(t)
     # fechas en None si no hubo ventas en 365 días
-    out = {"tiendas": tiendas, "hasta": f and f.hasta, "ini_sem": f and f.ini_sem,
-           "ini_mes": f and f.ini_mes, "isow": f and int(f.isow)}
+    out = {"tiendas": tiendas, "hasta": None, "ini_sem": None, "ini_mes": None, "isow": None}
+    if rows:
+        out.update(hasta=mx.isoformat(), ini_sem=ws.isoformat(), ini_mes=ms.isoformat(), isow=mx.isocalendar()[1])
     with lock:
         capa_cache[key] = (time.time() + 1800, out)
     return out
