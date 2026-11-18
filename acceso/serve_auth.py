@@ -161,14 +161,32 @@ body{font:16px system-ui,sans-serif;background:#0f172a;color:#e2e8f0;display:gri
 form{background:#1e293b;padding:28px;border-radius:10px;width:min(320px,90vw);display:grid;gap:12px}
 h1{font-size:18px;margin:0 0 4px}input,button{font:inherit;padding:10px;border-radius:6px;border:1px solid #475569;background:#0f172a;color:inherit}
 button{background:#2563eb;border-color:#2563eb;cursor:pointer}p{margin:0;color:#fca5a5;font-size:14px}small{color:#94a3b8}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}.lg{display:flex;gap:4px}
+.lg button{padding:4px 8px;font-size:12px;font-weight:600;background:transparent;border-color:#475569;color:#94a3b8}
+.lg button[aria-pressed=true]{background:#334155;color:#e2e8f0}
 </style>
 <form method=post action=/login>
-<h1>Coppel Map</h1>
-<input name=user placeholder="Usuario" autocomplete=username required>
-<input name=code inputmode=numeric pattern="[0-9]{6}" maxlength=6 placeholder="Código de 6 dígitos" autocomplete=one-time-code required>
-%s<button>Entrar</button>
-<small>El código lo da tu app Authenticator.</small>
-</form>"""
+<div class=top><h1>Coppel Map</h1><div class=lg role=group aria-label="Idioma · Language · 语言"><button type=button data-l=es>ES</button><button type=button data-l=en>EN</button><button type=button data-l=zh>中文</button></div></div>
+<input name=user placeholder="Usuario" data-t=user autocomplete=username required>
+<input name=code inputmode=numeric pattern="[0-9]{6}" maxlength=6 placeholder="Código de 6 dígitos" data-t=code autocomplete=one-time-code required>
+%s<button data-t=enter>Entrar</button>
+<small data-t=hint>El código lo da tu app Authenticator.</small>
+</form>
+<script>
+// misma preferencia que el mapa (coppel-map:lang), para que el idioma se conserve al entrar
+const T={es:{loc:"es-MX",user:"Usuario",code:"Código de 6 dígitos",enter:"Entrar",hint:"El código lo da tu app Authenticator.",err:"Usuario o código incorrectos."},
+en:{loc:"en-US",user:"Username",code:"6-digit code",enter:"Sign in",hint:"Get the code from your Authenticator app.",err:"Wrong username or code."},
+zh:{loc:"zh-CN",user:"用户名",code:"6 位验证码",enter:"登录",hint:"验证码来自你的 Authenticator 应用。",err:"用户名或验证码错误。"}};
+function setL(l){
+  if(!T[l])l="es";try{localStorage.setItem("coppel-map:lang",l)}catch(e){}
+  document.documentElement.lang=T[l].loc;
+  document.querySelectorAll("[data-t]").forEach(e=>{const v=T[l][e.dataset.t];if(e.tagName==="INPUT")e.placeholder=v;else e.textContent=v});
+  document.querySelectorAll("[data-l]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===l));
+}
+document.querySelector(".lg").addEventListener("click",e=>{const b=e.target.closest("[data-l]");if(b)setL(b.dataset.l)});
+let saved="es";try{saved=localStorage.getItem("coppel-map:lang")||"es"}catch(e){}
+setL(saved);
+</script>"""
 
 
 class Auth(SimpleHTTPRequestHandler):
@@ -181,7 +199,7 @@ class Auth(SimpleHTTPRequestHandler):
         return False
 
     def page(self, status, err=""):
-        body = (PAGE % (f"<p>{html.escape(err)}</p>" if err else "")).encode()
+        body = (PAGE % (f"<p data-t=err>{html.escape(err)}</p>" if err else "")).encode()
         self.send_response(status)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
