@@ -859,6 +859,10 @@ h1{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:-.01
 .stack button:focus-visible{outline-offset:-2px}
 .stack button[aria-pressed="true"]{color:var(--me)}
 .stack button.busy .ic{animation:spin 1s linear infinite}
+.stack select{width:42px;height:42px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--fg);font:600 12px var(--body);text-align:center;text-align-last:center;appearance:none;-webkit-appearance:none;cursor:pointer;padding:0}
+.stack select:hover{background:var(--panel-2)}
+.stack select option{color:#0f1e3d;background:#fff}
+@media (pointer:coarse){.stack select{width:44px;height:44px}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .panel-open{position:fixed;z-index:10;top:16px;left:max(16px,env(safe-area-inset-left,0px));height:44px;padding:0 14px 0 10px;border-radius:12px;display:flex;align-items:center;gap:8px;font-weight:600;color:var(--fg)}
 .panel-open .logo{width:28px;height:28px;border-radius:8px}
@@ -977,109 +981,110 @@ h1{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:-.01
 }
 </style>
 
-<div id="map" role="application" aria-label="Mapa de ubicaciones Coppel en México"></div>
+<div id="map" role="application" aria-label="Mapa de ubicaciones Coppel en México" data-i18n-aria="mapAria"></div>
 
 <div class="brand-pill float" aria-hidden="true">
   <span class="logo"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>Coppel México
 </div>
 
-<button class="panel-open float" id="panelOpen" type="button" hidden aria-label="Mostrar panel de filtros">
+<button class="panel-open float" id="panelOpen" type="button" hidden aria-label="Mostrar panel de filtros" data-i18n-aria="openPanel">
   <span class="logo"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
-  <span>Filtros · <span id="openCount">0</span></span>
+  <span><span data-i18n="filters">Filtros</span> · <span id="openCount">0</span></span>
 </button>
 
-<aside class="panel" id="panel" aria-label="Filtros y resultados" data-snap="collapsed">
-  <button class="grab" id="grab" type="button" aria-label="Expandir o contraer el panel" aria-expanded="false"><span></span></button>
+<aside class="panel" id="panel" aria-label="Filtros y resultados" data-i18n-aria="panelAria" data-snap="collapsed">
+  <button class="grab" id="grab" type="button" aria-label="Expandir o contraer el panel" data-i18n-aria="grabAria" aria-expanded="false"><span></span></button>
   <header class="phead">
     <div class="brand">
       <span class="logo" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
       <div>
-        <h1>Tiendas Coppel en México</h1>
-        <p class="sub">Datos de coppel.com · 13 nov 2026</p>
+        <h1 data-i18n="h1">Tiendas Coppel en México</h1>
+        <p class="sub" data-i18n="sub">Datos de coppel.com · 13 nov 2026</p>
       </div>
     </div>
-    <button class="icon-btn" id="panelClose" type="button" aria-label="Ocultar panel" title="Ocultar panel"><svg class="ic" viewBox="0 0 24 24"><path d="M11 6l-6 6 6 6M19 6l-6 6 6 6"/></svg></button>
+    <button class="icon-btn" id="panelClose" type="button" aria-label="Ocultar panel" title="Ocultar panel" data-i18n-aria="hidePanel" data-i18n-title="hidePanel"><svg class="ic" viewBox="0 0 24 24"><path d="M11 6l-6 6 6 6M19 6l-6 6 6 6"/></svg></button>
   </header>
 
   <div class="search" id="searchBox" role="search">
     <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-    <input id="q" type="search" placeholder="Buscar tienda, municipio o CP" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"
-      role="combobox" aria-label="Buscar por nombre, colonia, municipio, estado o código postal" aria-expanded="false" aria-controls="sug" aria-autocomplete="list">
-    <kbd aria-hidden="true" title="Presiona / para buscar">/</kbd>
-    <button class="q-clear" id="qClear" type="button" hidden aria-label="Borrar búsqueda"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <ul class="sug" id="sug" role="listbox" aria-label="Sugerencias" hidden></ul>
+    <input id="q" type="search" placeholder="Buscar tienda, municipio o CP" data-i18n-ph="searchPh" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"
+      role="combobox" aria-label="Buscar por nombre, colonia, municipio, estado o código postal" data-i18n-aria="searchAria" aria-expanded="false" aria-controls="sug" aria-autocomplete="list">
+    <kbd aria-hidden="true" title="Presiona / para buscar" data-i18n-title="slash">/</kbd>
+    <button class="q-clear" id="qClear" type="button" hidden aria-label="Borrar búsqueda" data-i18n-aria="clearSearch"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <ul class="sug" id="sug" role="listbox" aria-label="Sugerencias" data-i18n-aria="sugAria" hidden></ul>
   </div>
 
   <div class="scroll" id="scroll">
     <div class="kpis" id="kpis" aria-live="polite">
       <div class="kpi main"><b id="count">0</b><span id="countLbl">ubicaciones visibles</span></div>
-      <div class="kpi"><b><span id="kStates">0</span><small> /32</small></b><span>estados</span></div>
-      <div class="kpi"><b><span id="kRegions">0</span><small> /9</small></b><span>regiones</span></div>
+      <div class="kpi"><b><span id="kStates">0</span><small> /32</small></b><span data-i18n="statesK">estados</span></div>
+      <div class="kpi"><b><span id="kRegions">0</span><small> /9</small></b><span data-i18n="regionsK">regiones</span></div>
     </div>
 
     <div class="pills" id="pills" hidden></div>
 
-    <section class="card" aria-label="Filtros">
+    <section class="card" aria-label="Filtros" data-i18n-aria="filters">
       <div>
         <div class="fl">
-          <span class="l" id="lblRegion">Región celular</span>
-          <label class="switch" for="colorReg"><input type="checkbox" id="colorReg" checked><i aria-hidden="true"></i>Colorear estados por región</label>
+          <span class="l" id="lblRegion" data-i18n="regionCel">Región celular</span>
+          <label class="switch" for="colorReg"><input type="checkbox" id="colorReg" checked><i aria-hidden="true"></i><span data-i18n="colorStates">Colorear estados por región</span></label>
         </div>
         <div class="rchips" id="rchips" role="group" aria-labelledby="lblRegion"></div>
         <p class="rname" id="rname"></p>
       </div>
       <div>
-        <div class="fl"><label class="l" for="estado">Estado</label></div>
+        <div class="fl"><label class="l" for="estado" data-i18n="state">Estado</label></div>
         <div class="select">
           <select id="estado"></select>
           <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
         </div>
       </div>
       <div>
-        <div class="fl"><span class="l" id="lblTipo">Tipo de ubicación</span><button class="link" id="allTypes" type="button">Ver todos</button></div>
+        <div class="fl"><span class="l" id="lblTipo" data-i18n="locType">Tipo de ubicación</span><button class="link" id="allTypes" type="button">Ver todos</button></div>
         <div class="chips" id="chips" role="group" aria-labelledby="lblTipo"></div>
       </div>
     </section>
 
-    <div class="tabs" role="tablist" aria-label="Resultados">
-      <button class="tab" id="tabResumen" role="tab" type="button" aria-selected="true" aria-controls="pResumen">Resumen</button>
-      <button class="tab" id="tabUbic" role="tab" type="button" aria-selected="false" aria-controls="pUbic" tabindex="-1">Ubicaciones <em id="tabCount">0</em></button>
+    <div class="tabs" role="tablist" aria-label="Resultados" data-i18n-aria="results">
+      <button class="tab" id="tabResumen" role="tab" type="button" aria-selected="true" aria-controls="pResumen" data-i18n="tabSummary">Resumen</button>
+      <button class="tab" id="tabUbic" role="tab" type="button" aria-selected="false" aria-controls="pUbic" tabindex="-1"><span data-i18n="tabLocations">Ubicaciones</span> <em id="tabCount">0</em></button>
     </div>
 
     <div class="tabpanel" id="pResumen" role="tabpanel" aria-labelledby="tabResumen">
-      <div class="seg" role="group" aria-label="Agrupar conteo"><button type="button" id="byState" aria-pressed="true">Por estado</button><button type="button" id="byRegion" aria-pressed="false">Por región</button></div>
-      <div class="rows" id="list" aria-label="Conteo de ubicaciones"></div>
+      <div class="seg" role="group" aria-label="Agrupar conteo" data-i18n-aria="groupAria"><button type="button" id="byState" aria-pressed="true" data-i18n="byState">Por estado</button><button type="button" id="byRegion" aria-pressed="false" data-i18n="byRegion">Por región</button></div>
+      <div class="rows" id="list" aria-label="Conteo de ubicaciones" data-i18n-aria="countAria"></div>
     </div>
     <div class="tabpanel" id="pUbic" role="tabpanel" aria-labelledby="tabUbic" hidden>
       <p class="note" id="sortNote"></p>
       <div class="stores" id="stores"></div>
-      <button class="more" id="more" type="button" hidden>Mostrar más</button>
+      <button class="more" id="more" type="button" hidden data-i18n="showMore">Mostrar más</button>
     </div>
 
-    <p class="src">Coordenadas exactas del pin en el localizador oficial. Regiones según las 9 regiones celulares del IFT (las que usa Telcel); los municipios de excepción (La Laguna, San Luis Río Colorado y el norte de Jalisco) se asignan por tienda. Las sucursales y cajeros BanCoppel que la fuente trae sin tipo se clasifican por su nombre.</p>
+    <p class="src" data-i18n="src">Coordenadas exactas del pin en el localizador oficial. Regiones según las 9 regiones celulares del IFT (las que usa Telcel); los municipios de excepción (La Laguna, San Luis Río Colorado y el norte de Jalisco) se asignan por tienda. Las sucursales y cajeros BanCoppel que la fuente trae sin tipo se clasifican por su nombre.</p>
   </div>
 </aside>
 
 <div class="ctrls">
   <div class="seg base float" hidden style="display:none" role="group" aria-label="Mapa base"><button type="button" id="baseSimple" aria-pressed="false">Simple</button><button type="button" id="baseCalles" aria-pressed="true">Calles</button></div>
-  <div class="stack float" role="group" aria-label="Zoom">
-    <button type="button" id="zin" aria-label="Acercar" title="Acercar"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
-    <button type="button" id="zout" aria-label="Alejar" title="Alejar"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+  <div class="stack float" role="group" aria-label="Zoom" data-i18n-aria="zoom">
+    <button type="button" id="zin" aria-label="Acercar" title="Acercar" data-i18n-aria="zin" data-i18n-title="zin"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" id="zout" aria-label="Alejar" title="Alejar" data-i18n-aria="zout" data-i18n-title="zout"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
   </div>
-  <div class="stack float" role="group" aria-label="Herramientas del mapa">
-    <button type="button" id="locate" aria-label="Mi ubicación" title="Mi ubicación" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/></svg></button>
-    <button type="button" id="reset" aria-label="Restablecer vista" title="Restablecer vista"><svg class="ic" viewBox="0 0 24 24"><path d="M4 9V4h5M20 15v5h-5M20 9V4h-5M4 15v5h5"/></svg></button>
-    <button type="button" id="theme" aria-label="Cambiar a modo oscuro" title="Cambiar tema"></button>
+  <div class="stack float" role="group" aria-label="Herramientas del mapa" data-i18n-aria="tools">
+    <button type="button" id="locate" aria-label="Mi ubicación" title="Mi ubicación" data-i18n-aria="myLoc" data-i18n-title="myLoc" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/></svg></button>
+    <button type="button" id="reset" aria-label="Restablecer vista" title="Restablecer vista" data-i18n-aria="resetView" data-i18n-title="resetView"><svg class="ic" viewBox="0 0 24 24"><path d="M4 9V4h5M20 15v5h-5M20 9V4h-5M4 15v5h5"/></svg></button>
+    <button type="button" id="theme" aria-label="Cambiar a modo oscuro" title="Cambiar tema" data-i18n-title="themeTitle"></button>
+    <select id="lang" aria-label="Idioma · Language · 语言" title="Idioma · Language · 语言"><option value="es">ES</option><option value="en">EN</option><option value="zh">中文</option></select>
   </div>
 </div>
 
 <div class="legend float" id="legend">
-  <button class="legend-h" id="legendBtn" type="button" aria-expanded="true" aria-controls="legendBody">Leyenda<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+  <button class="legend-h" id="legendBtn" type="button" aria-expanded="true" aria-controls="legendBody"><span data-i18n="legend">Leyenda</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
   <div class="legend-b" id="legendBody">
-    <span><span class="dot" style="background:var(--pin);box-shadow:0 0 0 1px var(--pin-edge)"></span>Tienda Coppel</span>
-    <span><span class="dot" style="background:var(--nosale)"></span>Tienda sin ventas (ya no vende)</span>
-    <span><span class="dot" style="background:var(--other)"></span>Otra ubicación (cajero, BanCoppel…)</span>
-    <span id="legendMe" hidden><span class="dot me"></span>Tu ubicación</span>
+    <span><span class="dot" style="background:var(--pin);box-shadow:0 0 0 1px var(--pin-edge)"></span><span data-i18n="lgStore">Tienda Coppel</span></span>
+    <span><span class="dot" style="background:var(--nosale)"></span><span data-i18n="lgNoSale">Tienda sin ventas (ya no vende)</span></span>
+    <span><span class="dot" style="background:var(--other)"></span><span data-i18n="lgOther">Otra ubicación (cajero, BanCoppel…)</span></span>
+    <span id="legendMe" hidden><span class="dot me"></span><span data-i18n="lgMe">Tu ubicación</span></span>
     <div class="rg" id="rgLegend"></div>
   </div>
 </div>
@@ -1093,7 +1098,6 @@ const D=[["Coppel Plaza Portal","Av. Sonora 1033, Entre Calle Emiliano Zapata y 
 const SN={"1":"1237","2":"1237","3":"36,1111","5":"6507","6":"7967","7":"562","8":"243","9":"1138","10":"92,539","11":"7663","12":"1138","13":"1138","14":"1364","17":"499","21":"7600","22":"1029","24":"36,1111","26":"1336","27":"1135","28":"7781","29":"397","30":"946","31":"552","32":"1366","33":"49","34":"55","35":"525","37":"7755","38":"38","40":"322","42":"1157","45":"651,1051,1257","47":"6512","50":"1176","51":"7644","54":"43,7691","57":"1233","61":"6773","62":"6552","63":"6507","64":"235","65":"6680","66":"1268","67":"61","68":"23","70":"172","71":"289","72":"7738","74":"694","75":"344","77":"7729","79":"553","81":"7961","84":"7753","85":"1304,7643","87":"57","90":"127","92":"6866","93":"245","96":"7632","97":"444","98":"955","99":"96","100":"6573","102":"33,799","103":"578","104":"1495","106":"7773","109":"236","110":"345,1375","111":"345,1375","113":"412","114":"95","116":"693","120":"7934","121":"51","122":"51","123":"7628","125":"35","127":"1289","128":"315","131":"6589","133":"578","135":"7803","136":"412","137":"1270","140":"313","141":"494,1041","142":"6507","143":"1054","146":"7626","147":"1024","149":"1115","150":"1090","151":"1406","155":"180","156":"112","157":"711","159":"58","162":"246","164":"217,675,1298","166":"1044,7859","167":"1044,7859","168":"7768","169":"6519","171":"100","174":"7853","175":"7718","177":"372","178":"217,675,1298","179":"218","182":"7653","184":"915","185":"272","186":"274","188":"1337","189":"997,1380","190":"104,276","191":"7790","193":"88","194":"1493","195":"1099","196":"473","197":"217,675,1298","199":"375","200":"7720","201":"384","202":"776","203":"82,1346","204":"7899","205":"273","206":"1309","208":"134","209":"885,1258","211":"6575","212":"116","214":"7627","219":"786","222":"1309","224":"6521","226":"496","227":"1360","231":"114","233":"1013","234":"1478","235":"651,1051,1257","237":"333","239":"118","240":"7604","244":"1134","245":"1271","246":"1226","247":"7789","249":"7889","252":"370","253":"471","256":"1195","257":"691","259":"103","260":"21,1170","261":"651,1051,1257","264":"7950","265":"7950","267":"117","270":"346","271":"1338","273":"1211","280":"1390","282":"286","283":"87","284":"7777","285":"6599","287":"188","288":"1027","289":"7828","290":"722","291":"486,810","295":"89","296":"86,879,7764","297":"1160","299":"209","300":"888","303":"1389","308":"425","309":"6656","310":"758","312":"1060","313":"651,1051,1257","314":"6720","315":"512","316":"331","319":"396","323":"7824","324":"1095","325":"248","326":"954","329":"1206","330":"104,276","332":"419","334":"1196","335":"511","336":"6610","337":"1304,7643","338":"1271","339":"7761","340":"542,822","341":"1159","342":"890","343":"82,1346","345":"84,1075","346":"7715","347":"25","348":"483","349":"483","350":"656","351":"722","352":"21,1170","356":"6548","362":"979","364":"694","365":"462","366":"1050","367":"176","368":"1127","369":"704","370":"1352","372":"144","374":"1362","375":"486,810","376":"284","378":"130","380":"232,460,735,770,815","381":"122,435,1031,1136,7603","382":"7822","383":"44","384":"122,435,1031,1136,7603","386":"7772","387":"723","388":"6546","389":"7851","390":"121,893","391":"7978","394":"6560","397":"1006","398":"1388","399":"870","400":"980","402":"846,1052","403":"299","404":"1217","406":"330","407":"6530","413":"7688","414":"263","415":"1150","417":"420","418":"699","419":"352","421":"126","422":"852","423":"846,1052","424":"1097","425":"997,1380","426":"1293","428":"6559","429":"880","430":"1028","431":"421","433":"1089","435":"6568","437":"1179","438":"7771","440":"1340","446":"1300","447":"86,879,7764","448":"7607","450":"1208","451":"317","452":"1314","453":"304","456":"847","457":"82,1346","458":"1158","459":"660,696","460":"232,460,735,770,815","461":"942","463":"320","465":"660,696","467":"324,853,964","468":"217,675,1298","469":"86,879,7764","471":"1049","473":"232,460,735,770,815","474":"1010","475":"1339","477":"133","479":"431","480":"1310","483":"1299","487":"7787","488":"50","490":"542,822","493":"7945","494":"298,659,891","495":"298,659,891","498":"324,853,964","499":"1353","501":"147","502":"801","503":"406","505":"646","506":"217,675,1298","507":"217,675,1298","508":"82,1346","509":"628","510":"423","512":"257","513":"162,518","515":"6545","516":"163","518":"644,7856","519":"35","521":"801","524":"889","526":"6578","528":"327","530":"1001","531":"796","532":"7694","534":"1343","535":"1342","536":"651,1051,1257","537":"7939","539":"551,1222","541":"1030","542":"551,1222","544":"984","545":"340,806,811,812,821,945","547":"133","549":"94","551":"7866","553":"6501","554":"1123","555":"59","557":"1132","559":"644,787,7645,7647,7827,7856,7916,7958","563":"560","565":"991","567":"716,828,866,956,7870","568":"697","569":"1020","570":"1074","571":"7884","572":"1207","574":"1281","575":"30","576":"7782","579":"280","580":"1002","581":"1453","582":"233","583":"14","584":"70","585":"19","586":"195","587":"1186","589":"7836","591":"1218","594":"1312","598":"232,460,735,770,815","600":"6681","601":"474","603":"901","604":"313","605":"787,7827","606":"340,806,811,812,821,945","608":"7712","609":"1313","610":"1262","611":"1173","612":"7846","613":"1319","615":"1127","616":"340,806,811,812,821,945","617":"340,806,811,812,821,945","618":"84,1075","619":"1359","620":"1093","622":"271","623":"1021","626":"383","628":"217,675,1298","629":"1328","631":"1165","633":"885,1258","634":"690","635":"232,460,735,770,815","639":"7965","640":"1455","643":"279","644":"968,1083","646":"1057,1488","647":"1152","648":"578","649":"244","651":"1235","652":"324,853,964","654":"1354","655":"1275","657":"342","659":"1057,1488","660":"42,944,1141,1273,1295","661":"987","662":"7669","663":"82,1346","664":"1129","668":"216","669":"70","673":"42,944,1141,1273,1295","674":"1128","675":"1033","676":"653","677":"1071","678":"424","680":"7641","681":"676,1126,7783","682":"42,944,1141,1273,1295","683":"7785","685":"1057,1488","686":"485","688":"778","690":"481,1014","692":"1476","693":"459","695":"69","697":"968,1083","698":"487","701":"7946","702":"287,434,900,1276,7724","703":"1311","705":"340,806,811,812,821,945","706":"290","709":"536","710":"506","711":"917","712":"6663","713":"7670","718":"149","720":"630","721":"828","726":"37,360","727":"1067","728":"1155","729":"91","731":"91","732":"1171","733":"1277","734":"7614","736":"481,1014","739":"7888","742":"353","743":"598","746":"122,435,1031,1136,7603","747":"509,1116,1137,1294","749":"343","751":"7624","752":"560","754":"74","757":"259,1009,1473","758":"185","760":"1166","761":"481,1014","765":"65","767":"52","768":"7966","769":"984","773":"705,911,1435","774":"157","776":"136","777":"1117","778":"967","779":"122,435,1031,1136,7603","780":"121,893","781":"6597","782":"325","784":"771","786":"403","788":"6743","789":"7674","790":"484","791":"122,435,1031,1136,7603","793":"122,435,1031,1136,7603","794":"298,659,891","795":"422","796":"1191","797":"7832","799":"392","800":"42,944,1141,1273,1295","801":"1329","802":"6507","803":"11","804":"267","806":"490","807":"7813","809":"1164","811":"479","814":"13","815":"1252","816":"81","817":"2,7960","818":"3","822":"2,7960","824":"772","825":"230","826":"1481","828":"415","831":"5","832":"239","835":"825","836":"259,1009,1473","837":"7714","839":"204","841":"259,1009,1473","844":"1207","846":"469","851":"966","852":"1239","854":"6647","856":"1358","857":"445","858":"1213","860":"1119","861":"7931","862":"122,435,1031,1136,7603","863":"1151","864":"222","865":"676,1126,7783","867":"192,388,582,1174,1220,7634,7635","868":"327","870":"192,388,582,1174,1220,7634,7635","871":"7911","872":"1104","873":"143,160,168,541,913,978,1004,1048,7740","874":"192,388,582,1174,1220,7634,7635","875":"6630","876":"215","877":"702","878":"940","879":"7782","880":"912","882":"6525","884":"1272","885":"146","886":"579","887":"7","889":"820","892":"7651","894":"6510","895":"816","896":"1445","897":"1070","900":"1438","903":"1291","904":"159,349,813","905":"389,1436","906":"7780","907":"988","909":"401","910":"7657","912":"498,873,1496","913":"319","916":"187,7709","919":"1080","920":"408","921":"173","922":"7733","923":"881","924":"7850","926":"402,733","927":"1058","928":"1073","932":"1194","933":"807,868","934":"199","935":"151","939":"488","940":"714,1444","941":"1198","943":"745,1000","944":"454,746,824,836","946":"143,160,168,541,913,978,1004,1048,7740","948":"498,873,1496","950":"173","951":"464,1345","953":"498,873,1496","955":"1439","958":"872","962":"407,858","964":"999","967":"251","969":"413,857","970":"6591","971":"351","972":"943","978":"6721","980":"464,1345","984":"454,746,824,836","985":"7712","989":"871","992":"819","993":"192,388,582,1174,1220,7634,7635","994":"64","996":"189","997":"381","998":"165","1000":"395,620","1001":"395,620","1003":"981,1066,7811","1004":"189","1006":"1410","1007":"1430","1008":"1483","1009":"159,349,813","1010":"453","1011":"661","1012":"1026","1015":"190","1016":"6580","1018":"159,349,813","1019":"446","1020":"389,1436","1021":"6529","1026":"451","1027":"454,746,824,836","1029":"1082","1030":"7858","1031":"7655","1032":"154","1033":"794","1035":"6531","1037":"862","1038":"192,388,582,1174,1220,7634,7635","1040":"208","1041":"1414","1045":"339,476","1047":"1446","1049":"7630","1051":"408","1054":"994,1199","1057":"472","1058":"842","1059":"613","1060":"498,873,1496","1061":"1056","1065":"261","1066":"533","1067":"405","1068":"795","1069":"1447","1070":"192,388,582,1174,1220,7634,7635","1071":"184","1073":"910,1408","1075":"910,1408","1076":"714,1444","1077":"7637","1079":"461","1080":"339,476","1081":"1450","1082":"166","1085":"7677","1087":"1247,7717","1088":"1247,7717","1089":"1267","1091":"981,1066,7811","1093":"7795","1094":"794","1095":"7944","1096":"749","1097":"789,1100","1098":"1341","1100":"7575","1102":"1431","1104":"6590","1105":"1449","1106":"480","1109":"193","1110":"7631","1113":"725","1114":"745,1000","1115":"7797","1117":"1384","1119":"407,858","1120":"489","1121":"1190","1122":"7686","1123":"532","1124":"802","1127":"224","1128":"7840","1129":"6517","1130":"1163","1131":"6642","1134":"1039","1135":"1219","1136":"200","1138":"6633","1140":"1404","1141":"1200","1143":"833","1144":"976","1145":"7982","1146":"1432","1147":"731","1148":"1434","1149":"167","1152":"1421","1154":"1403","1156":"827","1157":"840","1158":"732","1160":"293","1163":"1448","1165":"1315","1166":"971","1167":"137,376,909,972","1169":"1402","1170":"7754","1171":"7681","1172":"566","1173":"741","1174":"1025","1177":"7689","1179":"1470","1182":"1400","1184":"6579","1186":"7730","1187":"7838","1188":"1030","1189":"726","1190":"318","1193":"6713","1195":"794","1196":"705,911,1435","1198":"7896","1199":"6563","1201":"563,1411","1203":"563,1411","1204":"361","1205":"1405","1208":"905","1209":"1415","1210":"981,1066,7811","1212":"1203","1214":"410","1215":"1194","1216":"7864","1217":"6675","1218":"933","1221":"907","1222":"391","1226":"1491","1228":"1418","1232":"253","1233":"7848","1234":"705,911,1435","1235":"1452","1236":"357","1239":"249","1241":"316","1242":"1017","1243":"443","1244":"1291","1248":"1451","1249":"1184","1251":"358","1254":"1370","1256":"48","1257":"7633","1259":"1088","1260":"297","1261":"7948","1263":"1104","1266":"1016","1267":"192,388,582,1174,1220,7634,7635","1270":"255,7708","1271":"1429","1272":"6574","1273":"7672","1277":"1401","1279":"442","1281":"455","1284":"1076","1286":"255,7708","1289":"1427","1290":"441","1291":"250","1295":"906","1297":"356","1299":"170","1300":"734","1301":"433,482,1249,1285","1302":"1085","1303":"830,841","1305":"7804","1306":"1110","1310":"725","1311":"1204","1314":"797","1315":"7937","1316":"452","1318":"7699","1319":"1149","1322":"6681","1323":"283","1327":"7640","1331":"938","1332":"1393","1333":"927","1335":"1334,1369","1336":"898","1337":"894","1338":"7830","1340":"597,7734","1341":"597,7734","1342":"7829","1347":"227","1349":"221,226","1350":"1202","1351":"447,683","1352":"447,683","1353":"6544","1357":"1479","1358":"409","1359":"364","1360":"1437","1361":"221,226","1363":"1201","1365":"1053","1366":"7693","1368":"6555","1369":"132","1370":"169","1371":"1181","1372":"7813","1373":"7622","1374":"874","1375":"6567","1376":"465,7726","1377":"366","1378":"354","1379":"282","1380":"1416","1383":"6522","1384":"1368","1387":"433,482,1249,1285","1390":"1365","1391":"1406","1394":"1221","1396":"311","1398":"321","1399":"42,944,1141,1273,1295","1400":"740","1401":"42,944,1141,1273,1295","1403":"869","1404":"1372","1406":"807,868","1407":"454,746,824,836","1408":"7620","1409":"7645","1410":"877,969","1412":"84,1075","1413":"1131","1420":"995","1421":"466","1422":"1456","1423":"6539","1424":"1250","1425":"497","1428":"962","1431":"536","1434":"8","1436":"183","1441":"6649","1443":"876","1444":"1101","1447":"220,937","1448":"1428","1451":"7784","1453":"1142","1455":"698","1456":"1350","1457":"863","1458":"1011","1460":"438","1461":"1161","1463":"922","1464":"6553","1465":"1125","1467":"7739","1468":"677","1470":"877,969","1471":"931","1473":"350","1475":"1251","1477":"962","1478":"855","1479":"805","1480":"1290","1482":"210","1485":"844","1486":"1317","1487":"440","1489":"1260","1491":"47","1492":"6624","1493":"941","1494":"7775","1496":"1078","1499":"37,360","1505":"7636","1508":"962","1510":"934","1512":"62,625","1513":"182","1514":"323","1517":"792","1518":"1108","1519":"7719","1520":"294,918,1109,7741","1524":"448,721","1525":"1169","1526":"941","1530":"71","1531":"1265,1305","1532":"493","1534":"1263,1424","1535":"1263,1424","1537":"895","1541":"7623","1547":"72","1550":"1468","1552":"242","1553":"7711","1554":"73","1555":"7814","1557":"6564","1563":"155","1564":"1349","1567":"6646","1569":"1287","1575":"7676","1578":"832","1579":"904","1580":"433,482,1249,1285","1581":"433,482,1249,1285","1584":"373","1585":"426","1586":"348","1588":"386","1589":"7805","1590":"143,160,168,541,913,978,1004,1048,7740","1592":"6634","1593":"680","1594":"793","1595":"6581","1597":"294,918,1109,7741","1600":"1382","1601":"7725","1603":"935","1606":"307,7656","1609":"1062","1611":"1189","1612":"1230","1613":"45,509,886,1116,1137,1282,1288,1294,1392,7629,7769","1614":"7786","1615":"1229","1616":"1197","1618":"80","1619":"382","1620":"439,957,7847","1622":"374","1624":"1073","1625":"1227","1626":"761","1629":"941","1630":"390","1632":"1391","1633":"948","1636":"422","1637":"7916","1639":"393","1640":"393","1642":"17","1643":"897","1644":"1265,1305","1646":"237","1652":"6751","1653":"1279","1655":"939","1656":"764","1657":"1290","1659":"6637","1660":"1251","1662":"307,7656","1663":"554","1664":"1344","1666":"763","1667":"6513","1668":"1486","1670":"1497","1671":"622","1672":"692","1674":"729,1086","1675":"729,1086","1677":"1371","1679":"1469","1680":"737,1023","1681":"1397","1682":"728","1683":"737,1023","1684":"7845","1685":"1180","1686":"605","1687":"287,434,900,1276,7724","1688":"377,7927","1689":"1130","1691":"902","1693":"1334,1369","1694":"1331,1482","1695":"7823","1696":"145","1697":"296,1321","1698":"6668","1700":"296,1321","1702":"1210","1703":"7618","1707":"1259,1484,7849","1708":"7915","1709":"676,1126,7783","1711":"7963","1713":"219,571","1714":"1047","1717":"7675","1719":"899","1721":"1084","1726":"433,482,1249,1285","1728":"990","1729":"1107","1733":"6572","1735":"295","1737":"143,160,168,541,913,978,1004,1048,7740","1738":"177,747","1739":"287,434,900,1276,7724","1747":"610","1748":"6537","1749":"137,376,909,972","1754":"1187","1756":"6569","1757":"1244","1758":"1145","1759":"7748","1761":"78","1763":"6550","1768":"941","1769":"448,721","1771":"6511","1774":"125","1776":"765","1777":"1193,7680","1781":"1022","1782":"6532","1783":"952","1785":"1133","1786":"7692","1787":"1242","1788":"262","1789":"294,918,1109,7741","1790":"294,918,1109,7741","1791":"411","1793":"212","1794":"7826","1795":"404","1797":"557,1234,1259,1484,7849","1798":"79","1800":"178","1802":"7867","1803":"7837","1804":"718","1806":"28","1807":"18,119","1813":"924,1255","1814":"622","1817":"854","1819":"67","1820":"986,1034","1821":"7989","1822":"492","1827":"728","1828":"1098","1831":"1379","1832":"6570","1835":"958","1837":"177,747","1838":"7698","1840":"766","1841":"1378","1842":"143,160,168,541,913,978,1004,1048,7740","1844":"1102","1847":"6569","1848":"143,160,168,541,913,978,1004,1048,7740","1850":"143,160,168,541,913,978,1004,1048,7740","1851":"439,957,7847","1854":"171,671","1858":"6504","1860":"7716","1862":"207","1865":"1103","1867":"783","1869":"363,1059","1870":"6508","1871":"7788","1873":"7697","1874":"6542","1875":"7633","1876":"1284","1878":"923","1879":"7608","1881":"287,434,900,1276,7724","1884":"1120","1886":"34","1888":"12","1891":"10","1893":"16,131","1894":"623","1895":"6505","1896":"1081","1897":"1112","1898":"164","1900":"1035,1077,1254","1901":"385,592,920","1902":"1043,1092","1903":"7794","1906":"1114,1407","1907":"925","1909":"883","1911":"1212","1912":"654","1913":"449,689","1914":"306","1919":"6538","1921":"465,7726","1923":"379","1924":"1012","1925":"287,434,900,1276,7724","1927":"1035,1077,1254","1928":"7723","1931":"363,1059","1932":"884","1933":"7762","1934":"926","1935":"7722","1937":"1043,1092","1938":"701,7710","1939":"701,7710","1940":"1180","1941":"7819","1943":"738","1945":"1180","1946":"864","1948":"1280,1490","1950":"477,860","1951":"477,860","1953":"7807","1954":"7747","1955":"7760","1957":"7612","1959":"6502","1961":"363,1059","1962":"363,1059","1964":"1316","1966":"6526","1969":"1175","1971":"1286","1972":"6569","1974":"202","1975":"1087","1976":"7756","1979":"6527","1984":"137,376,909,972","1986":"137,376,909,972","1989":"717","1990":"1007","1995":"1035,1077,1254","1996":"767","1999":"7916","2001":"6657","2002":"354","2005":"6586","2006":"467","2009":"1035,1077,1254","2010":"260","2014":"7855","2016":"101","2018":"46","2019":"449,689","2021":"914","2023":"587","2025":"1406","2028":"142","2030":"6551","2034":"150","2038":"470","2042":"302","2045":"676,1126,7783","2047":"62,625","2050":"6556","2059":"1494","2061":"626","2063":"1","2071":"1492","2072":"6571","2073":"6585","2078":"6566","2079":"379","2081":"379","2085":"1227","2088":"7970","2089":"1225","2090":"6527","2091":"1015","2092":"986,1034","2095":"1224","2097":"916","2098":"6503","2102":"234","2105":"7782","2109":"347","2110":"7943","2113":"143,160,168,541,913,978,1004,1048,7740","2114":"143,160,168,541,913,978,1004,1048,7740","2115":"143,160,168,541,913,978,1004,1048,7740","2116":"143,160,168,541,913,978,1004,1048,7740","2118":"639,686","2119":"143,160,168,541,913,978,1004,1048,7740","2122":"1474","2123":"16,131","2126":"18,119","2132":"377,7927","2134":"1264","2135":"32","2136":"214","2142":"211","2143":"1042","2146":"137,376,909,972","2147":"845","2148":"1045","2149":"7684","2151":"908,1162","2153":"6528","2156":"1079","2158":"975","2159":"926","2161":"7652","2162":"240","2164":"1005","2165":"1253","2166":"1398","2170":"450","2171":"1335","2172":"430","2173":"959","2176":"7611","2178":"1303","2179":"960,7953","2181":"329","2183":"156,288,334","2187":"308","2188":"596","2190":"275","2191":"7619","2193":"156,288,334","2195":"1118","2197":"355","2199":"1248","2200":"7776","2201":"1182","2204":"359","2205":"120","2206":"186","2207":"277","2211":"6524","2212":"191","2216":"161","2217":"156,288,334","2218":"156,288,334","2219":"526","2220":"1387","2221":"1306","2222":"1297","2224":"7765","2225":"7759","2226":"281","2227":"26","2228":"878","2231":"16,131","2232":"1248","2233":"428","2234":"6588","2236":"679","2239":"495","2242":"7860","2244":"416","2245":"213","2246":"859","2247":"769","2248":"31","2249":"713","2250":"335","2254":"336","2257":"362","2258":"527","2261":"1032","2262":"1322","2263":"982","2267":"303","2269":"808","2270":"681","2271":"882,7808","2275":"7919","2277":"892","2278":"6543","2279":"751","2281":"1019","2284":"1139","2286":"1243","2289":"1008","2290":"1385","2292":"6509","2293":"1037","2294":"1064","2295":"1269","2296":"231","2297":"196","2298":"7898","2300":"7749","2302":"6596","2309":"285","2310":"229","2311":"326","2312":"314","2313":"1483","2314":"197","2315":"882,7808","2316":"882,7808","2320":"1471","2322":"1332","2324":"1256","2326":"960,7953","2327":"241","2329":"367","2331":"861","2332":"856","2333":"7818","2335":"7615","2338":"585","2339":"309","2343":"264","2344":"7976","2345":"928","2346":"1330","2347":"7647","2348":"6640","2351":"973","2353":"463","2355":"6678","2356":"394","2360":"961","2363":"201","2365":"6514","2366":"953","2368":"300","2370":"7701","2371":"105","2372":"568","2374":"6583","2377":"7610","2380":"258","2383":"90","2385":"301","2386":"457","2390":"270,291","2391":"29","2394":"1205","2396":"1308","2398":"7638","2399":"266,369","2400":"1122","2402":"6598","2408":"398","2412":"269","2414":"268","2418":"7944","2419":"829","2420":"929","2422":"265","2424":"6725","2425":"851","2426":"851","2427":"77","2430":"203","2432":"6673","2434":"475","2437":"896","2439":"6625","2441":"1238","2442":"98","2443":"98","2445":"102","2446":"1357","2447":"7737","2448":"99","2450":"341","2451":"1261","2454":"652","2455":"198","2456":"97","2458":"181","2459":"685","2460":"76,436","2461":"225","2462":"458","2464":"6584","2466":"643","2467":"266,369","2470":"779","2471":"338","2476":"75,179","2477":"6540","2478":"45,509,886,1116,1137,1282,1288,1294,1392,7629,7769","2479":"365","2480":"104","2481":"7994","2482":"1477","2483":"7793","2484":"7746","2485":"1266","2486":"1480","2487":"7639","2488":"919","2489":"767","2490":"1453","2491":"655","2492":"908","2493":"1325","2494":"637","2495":"7895","2496":"985","2497":"1094","2498":"671","2499":"745","2500":"1373","2501":"599","2502":"575","2503":"682"}; // índice → número(s) de tienda Coppel en SQL (cruce por nombre+estado+región)
 const UC={"Zacatecas":"zac","Durango":"dur","Aguascalientes":"agu","San Luis Potosí":"slp","Coahuila":"coa","Jalisco":"jal","Quintana Roo":"roo","Guanajuato":"gua","Nuevo León":"nle","Michoacán":"mic","Nayarit":"nay","Tamaulipas":"tam","Sinaloa":"sin","Morelos":"mor","Querétaro":"que","Hidalgo":"hid","Chihuahua":"chh","Veracruz":"ver","Estado de México":"mex","Colima":"col","Ciudad de México":"cmx","Puebla":"pue","Tlaxcala":"tla","Guerrero":"gro","Baja California Sur":"bcs","Sonora":"son","Oaxaca":"oax","Tabasco":"tab","Chiapas":"chp","Campeche":"cam","Yucatán":"yuc","Baja California":"bcn"},UX={"77":"slp/sanluispotosi/coppel-ricardo-b.-anaya","127":"coa/franciscoi-madero/coppel-francisco-i.-madero","129":"coa/franciscoi-madero/coppel-motos-via-plaza","180":"gua/guanajuato/coppel-motos-san-fco.-del-rincon","255":"nle/guadalupe/sucursal-bancoppel-santa-maria-nvo.-leon-24-hrs","366":"jal/guadalajara/coppel-r.-michel","612":"tam/gonzales/coppel-francisco-i.-madero","801":"sin/culiacan/coppel-canada-francisco-i.-madero","842":"sin/culiacan/atm-bancoppel-central-de-autobuses-milenium-i-a.-local","1043":"cmx/gustavoa-madero/sucursal-bancoppel-100-metros-24-hrs","1058":"cmx/gustavoa-madero/coppel-carranza","1064":"cmx/gustavoa-madero/atm-bancoppel-soriana-aragon","1066":"cmx/gustavoa-madero/coppel-canada-progreso","1071":"cmx/gustavoa-madero/coppel-cuautepec","1081":"cmx/gustavoa-madero/coppel-cien-metros","1092":"cmx/gustavoa-madero/sucursal-bancoppel-vista-norte-24-hrs","1110":"cmx/gustavoa-madero/coppel-vista-norte","1117":"cmx/gustavoa-madero/coppel-ropa-fortuna","1121":"cmx/gustavoa-madero/coppel-atzacoalcos","1123":"cmx/gustavoa-madero/coppel-canada-centenario","1124":"cmx/gustavoa-madero/coppel-ropa-la-moda","1131":"cmx/gustavoa-madero/coppel-cetram-martin-carrera","1134":"cmx/gustavoa-madero/coppel-canada-misterios","1137":"cmx/gustavoa-madero/coppel-bodega-remate","1145":"cmx/gustavoa-madero/coppel-parque-tepeyac","1147":"cmx/gustavoa-madero/coppel-canada-tamazula","1150":"cmx/gustavoa-madero/coppel-tecpan","1158":"hid/tulancingo/coppel-canada-manuel-f.-soto","1159":"hid/tulancingodebravo/atm-bancoppel-manuel-f.-soto-24-hrs","1209":"cmx/iztacalco/coppel-periferico-ote.","1465":"pue/huejotzingo/coppel-av.-martinez","1496":"pue/cuautlancingo/coppel-av.-mexico","1686":"ver/xalapa/coppel-canada-dr.-lucio","1725":"ver/huatusco/coppel-av.-i-oriente","1812":"ver/cuitlahuac/coppel-canada-av.-3","1925":"ver/carlosa-carrillo/coppel-canada-juarez","1929":"ver/angelr-cabada/sucursal-bancoppel-r-cabada-24-hrs","1958":"oax/oaxaca/coppel-canada-cd.-de-las-casas","2164":"oax/tehuantepec/coppel-av.-romero","2178":"oax/salinacruz/coppel-av.-acapulco","2208":"tab/villahermosa/atm-bancoppe-farmacia-union-av.-universidad","2285":"chp/teopisca/coppel-primera-av.-oriente","2321":"chp/lasmargaritas/coppel-primera-av.-oriente-sur","2358":"son/sanluisriocolorado/coppel-canada-fco.-i.-madero","2364":"roo/othonp-blanco/sucursal-bancoppel-corozal-24-hrs"};
 const SR={"Baja California": 1, "Baja California Sur": 1, "Sonora": 2, "Sinaloa": 2, "Chihuahua": 3, "Durango": 3, "Nuevo León": 4, "Tamaulipas": 4, "Coahuila": 4, "Jalisco": 5, "Colima": 5, "Michoacán": 5, "Nayarit": 5, "Aguascalientes": 6, "Guanajuato": 6, "Querétaro": 6, "San Luis Potosí": 6, "Zacatecas": 6, "Guerrero": 7, "Oaxaca": 7, "Puebla": 7, "Tlaxcala": 7, "Veracruz": 7, "Campeche": 8, "Chiapas": 8, "Quintana Roo": 8, "Tabasco": 8, "Yucatán": 8, "Ciudad de México": 9, "Estado de México": 9, "Hidalgo": 9, "Morelos": 9};
-const RNAME={1:'Baja California, BCS y San Luis Río Colorado',2:'Sonora y Sinaloa',3:'Chihuahua, Durango y La Laguna',4:'Nuevo León, Tamaulipas y Coahuila',5:'Jalisco, Colima, Michoacán y Nayarit',6:'Bajío y Centro-Norte',7:'Puebla, Veracruz, Oaxaca, Guerrero y Tlaxcala',8:'Sureste',9:'CDMX, Edo. de México, Hidalgo y Morelos'};
 const RCOL={1:'#e8743b',2:'#d4a017',3:'#a0522d',4:'#4a7fc1',5:'#3a9d5d',6:'#8b6fc9',7:'#d1497b',8:'#2aa6a6',9:'#6b8e23'};
 const FIX={'México':'Estado de México','Distrito Federal':'Ciudad de México'};
 const MULTI={'Coahuila':[3,4],'Sonora':[1,2],'Jalisco':[5,6]};
@@ -1101,13 +1105,86 @@ const TYPES=['Tiendas Coppel','Coppel Canadá','BanCoppel','Afore Coppel','Cajer
 const DEF_TYPES=[0,9]; // por defecto: Tiendas Coppel y tiendas sin ventas
 const PAGE=150;
 
+/* ── idiomas: español, inglés y chino (nombres propios, estados y direcciones no se traducen) ── */
+const I18N={
+es:{loc:'es-MX',title:'Mapa de tiendas Coppel',mapAria:'Mapa de ubicaciones Coppel en México',openPanel:'Mostrar panel de filtros',filters:'Filtros',panelAria:'Filtros y resultados',grabAria:'Expandir o contraer el panel',
+  h1:'Tiendas Coppel en México',sub:'Datos de coppel.com · 13 nov 2026',hidePanel:'Ocultar panel',searchPh:'Buscar tienda, municipio o CP',searchAria:'Buscar por nombre, colonia, municipio, estado o código postal',slash:'Presiona / para buscar',clearSearch:'Borrar búsqueda',sugAria:'Sugerencias',
+  visible1:'ubicación visible',visibleN:'ubicaciones visibles',statesK:'estados',regionsK:'regiones',regionCel:'Región celular',colorStates:'Colorear estados por región',state:'Estado',locType:'Tipo de ubicación',seeAll:'Ver todos',onlyStores:'Solo tiendas',
+  results:'Resultados',tabSummary:'Resumen',tabLocations:'Ubicaciones',groupAria:'Agrupar conteo',byState:'Por estado',byRegion:'Por región',countAria:'Conteo de ubicaciones',showMore:'Mostrar más',showMoreN:(n,m)=>`Mostrar más (${n} de ${m})`,
+  src:'Coordenadas exactas del pin en el localizador oficial. Regiones según las 9 regiones celulares del IFT (las que usa Telcel); los municipios de excepción (La Laguna, San Luis Río Colorado y el norte de Jalisco) se asignan por tienda. Las sucursales y cajeros BanCoppel que la fuente trae sin tipo se clasifican por su nombre.',
+  zoom:'Zoom',zin:'Acercar',zout:'Alejar',tools:'Herramientas del mapa',myLoc:'Mi ubicación',resetView:'Restablecer vista',themeTitle:'Cambiar tema',toLight:'Cambiar a modo claro',toDark:'Cambiar a modo oscuro',
+  legend:'Leyenda',lgStore:'Tienda Coppel',lgNoSale:'Tienda sin ventas (ya no vende)',lgOther:'Otra ubicación (cajero, BanCoppel…)',lgMe:'Tu ubicación',cellRegions:'Regiones celulares (IFT)',
+  allStates:'Todos los estados',allRegions:'Todas',regionN:k=>`Región ${k}`,regionAria:(k,n)=>`Región ${k}: ${n}`,regionBadge:k=>`Región R${k}`,atLeastOne:'Debe quedar al menos un tipo activo',rnameAll:'Las 9 regiones celulares del IFT (las que usa Telcel).',
+  wSearch:'búsqueda',wRegion:'región',wState:'estado',wTypes:'tipos',allTypes:'Todos los tipos',nTypes:n=>`${n} tipos`,removeFilter:(w,x)=>`Quitar filtro de ${w}: ${x}`,clearFilters:'Limpiar filtros',
+  noResults:'Sin resultados',tryAgain:'Prueba con otra búsqueda o limpia los filtros.',sortNear:'Ordenadas por cercanía a tu ubicación',sortName:'Ordenadas por nombre. Usa «Mi ubicación» para ver las más cercanas.',
+  filterByState:'Filtrar por estado',cp:'CP',noMatches:'Sin coincidencias para esa búsqueda.',copied:'Dirección copiada',copyFail:'No se pudo copiar la dirección',tilesFail:'No se pudo cargar el mapa de calles; se muestra el mapa simple.',
+  geoNo:'Tu navegador no permite obtener la ubicación.',geoOk:'Ubicaciones ordenadas por cercanía',geoDenied:'Permiso de ubicación denegado.',geoFail:'No se pudo obtener tu ubicación.',
+  call:n=>`Llamar al ${n}`,fromYou:d=>`a ${d} de ti`,directions:'Cómo llegar',copyAddr:'Copiar dirección',official:'Ver ficha oficial',gmaps:'Abrir en Google Maps',
+  capaLoading:'Cargando CAPA…',capaNoMatch:'Sin coincidencia en la base de ventas.',capaSub:'unidades vendidas y % Honor',capaMulti:'Varias tiendas con este nombre en el estado; revisa cuál es:',
+  lastDaysH:'Últimos días',asOf:d=>`al ${d}`,last7:'Últimos 7 días',last30:'Últimos 30 días',last365:'Últimos 365 días',calH:'Calendario en curso',calSub:'semana lun–dom',weekN:n=>`Semana W${n}`,monthOf:m=>`Mes de ${m}`,
+  honorTitle:(h,v)=>`${h} de ${v} unidades fueron Honor`,noSales365:'Sin ventas en los últimos 365 días.',
+  err_offline:'CAPA no disponible (abre el mapa desde el servidor con acceso a SQL).',err_bad:'Tienda no válida.',err_nosql:'Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt).',err_sql:'No se pudo consultar SQL.',
+  types:['Tiendas Coppel','Coppel Canadá','BanCoppel','Afore Coppel','Cajero','Motos','Bodega','Fashion Market','Otras','Sin ventas'],
+  rnames:{1:'Baja California, BCS y San Luis Río Colorado',2:'Sonora y Sinaloa',3:'Chihuahua, Durango y La Laguna',4:'Nuevo León, Tamaulipas y Coahuila',5:'Jalisco, Colima, Michoacán y Nayarit',6:'Bajío y Centro-Norte',7:'Puebla, Veracruz, Oaxaca, Guerrero y Tlaxcala',8:'Sureste',9:'CDMX, Edo. de México, Hidalgo y Morelos'}},
+en:{loc:'en-US',title:'Coppel store map',mapAria:'Map of Coppel locations in Mexico',openPanel:'Show filters panel',filters:'Filters',panelAria:'Filters and results',grabAria:'Expand or collapse the panel',
+  h1:'Coppel stores in Mexico',sub:'Data from coppel.com · Nov 13, 2026',hidePanel:'Hide panel',searchPh:'Search store, city or ZIP',searchAria:'Search by name, neighborhood, city, state or ZIP code',slash:'Press / to search',clearSearch:'Clear search',sugAria:'Suggestions',
+  visible1:'visible location',visibleN:'visible locations',statesK:'states',regionsK:'regions',regionCel:'Mobile region',colorStates:'Color states by region',state:'State',locType:'Location type',seeAll:'Show all',onlyStores:'Stores only',
+  results:'Results',tabSummary:'Summary',tabLocations:'Locations',groupAria:'Group counts',byState:'By state',byRegion:'By region',countAria:'Location count',showMore:'Show more',showMoreN:(n,m)=>`Show more (${n} of ${m})`,
+  src:'Exact pin coordinates from the official store locator. Regions follow the 9 IFT mobile regions (the ones Telcel uses); exception municipalities (La Laguna, San Luis Río Colorado and northern Jalisco) are assigned per store. BanCoppel branches and ATMs that the source lists without a type are classified by name.',
+  zoom:'Zoom',zin:'Zoom in',zout:'Zoom out',tools:'Map tools',myLoc:'My location',resetView:'Reset view',themeTitle:'Change theme',toLight:'Switch to light mode',toDark:'Switch to dark mode',
+  legend:'Legend',lgStore:'Coppel store',lgNoSale:'Store with no sales (no longer selling)',lgOther:'Other location (ATM, BanCoppel…)',lgMe:'Your location',cellRegions:'Mobile regions (IFT)',
+  allStates:'All states',allRegions:'All',regionN:k=>`Region ${k}`,regionAria:(k,n)=>`Region ${k}: ${n}`,regionBadge:k=>`Region R${k}`,atLeastOne:'At least one type must stay selected',rnameAll:'The 9 IFT mobile regions (the ones Telcel uses).',
+  wSearch:'search',wRegion:'region',wState:'state',wTypes:'types',allTypes:'All types',nTypes:n=>`${n} types`,removeFilter:(w,x)=>`Remove ${w} filter: ${x}`,clearFilters:'Clear filters',
+  noResults:'No results',tryAgain:'Try another search or clear the filters.',sortNear:'Sorted by distance from you',sortName:'Sorted by name. Use “My location” to see the closest ones.',
+  filterByState:'Filter by state',cp:'ZIP',noMatches:'No matches for that search.',copied:'Address copied',copyFail:'Could not copy the address',tilesFail:'Could not load the street map; showing the simple map.',
+  geoNo:'Your browser cannot get your location.',geoOk:'Locations sorted by distance',geoDenied:'Location permission denied.',geoFail:'Could not get your location.',
+  call:n=>`Call ${n}`,fromYou:d=>`${d} from you`,directions:'Directions',copyAddr:'Copy address',official:'Official page',gmaps:'Open in Google Maps',
+  capaLoading:'Loading CAPA…',capaNoMatch:'No match in the sales database.',capaSub:'units sold and Honor share',capaMulti:'Several stores share this name in the state; check which one it is:',
+  lastDaysH:'Last days',asOf:d=>`as of ${d}`,last7:'Last 7 days',last30:'Last 30 days',last365:'Last 365 days',calH:'Current calendar',calSub:'week Mon–Sun',weekN:n=>`Week W${n}`,monthOf:m=>m[0].toUpperCase()+m.slice(1),
+  honorTitle:(h,v)=>`${h} of ${v} units were Honor`,noSales365:'No sales in the last 365 days.',
+  err_offline:'CAPA unavailable (open the map from the server with SQL access).',err_bad:'Invalid store.',err_nosql:'SQL connection missing (COPPEL_SQL or acceso/sql.txt).',err_sql:'Could not query SQL.',
+  types:['Coppel stores','Coppel Canadá','BanCoppel','Afore Coppel','ATM','Motorcycles','Warehouse','Fashion Market','Other','No sales'],
+  rnames:{1:'Baja California, BCS and San Luis Río Colorado',2:'Sonora and Sinaloa',3:'Chihuahua, Durango and La Laguna',4:'Nuevo León, Tamaulipas and Coahuila',5:'Jalisco, Colima, Michoacán and Nayarit',6:'Bajío and North-Central',7:'Puebla, Veracruz, Oaxaca, Guerrero and Tlaxcala',8:'Southeast',9:'Mexico City, State of Mexico, Hidalgo and Morelos'}},
+zh:{loc:'zh-CN',title:'Coppel 门店地图',mapAria:'墨西哥 Coppel 网点地图',openPanel:'显示筛选面板',filters:'筛选',panelAria:'筛选与结果',grabAria:'展开或收起面板',
+  h1:'墨西哥 Coppel 门店',sub:'数据来源：coppel.com · 2026年11月13日',hidePanel:'隐藏面板',searchPh:'搜索门店、城市或邮编',searchAria:'按名称、街区、城市、州或邮编搜索',slash:'按 / 键搜索',clearSearch:'清除搜索',sugAria:'搜索建议',
+  visible1:'个可见网点',visibleN:'个可见网点',statesK:'个州',regionsK:'个大区',regionCel:'移动通信大区',colorStates:'按大区为各州着色',state:'州',locType:'网点类型',seeAll:'显示全部',onlyStores:'仅门店',
+  results:'结果',tabSummary:'汇总',tabLocations:'网点列表',groupAria:'分组统计',byState:'按州',byRegion:'按大区',countAria:'网点数量',showMore:'显示更多',showMoreN:(n,m)=>`显示更多（${n}/${m}）`,
+  src:'网点坐标来自官方门店定位器。大区按 IFT 的 9 个移动通信大区划分（Telcel 使用的划分）；例外城市（La Laguna、San Luis Río Colorado 和 Jalisco 北部）按门店单独划分。来源中未标注类型的 BanCoppel 分行和 ATM 按名称归类。',
+  zoom:'缩放',zin:'放大',zout:'缩小',tools:'地图工具',myLoc:'我的位置',resetView:'重置视图',themeTitle:'切换主题',toLight:'切换到浅色模式',toDark:'切换到深色模式',
+  legend:'图例',lgStore:'Coppel 门店',lgNoSale:'无销售门店（已停售）',lgOther:'其他网点（ATM、BanCoppel…）',lgMe:'你的位置',cellRegions:'移动通信大区（IFT）',
+  allStates:'所有州',allRegions:'全部',regionN:k=>`第 ${k} 大区`,regionAria:(k,n)=>`第 ${k} 大区：${n}`,regionBadge:k=>`R${k} 大区`,atLeastOne:'至少需要保留一种类型',rnameAll:'IFT 划分的 9 个移动通信大区（Telcel 使用的划分）。',
+  wSearch:'搜索',wRegion:'大区',wState:'州',wTypes:'类型',allTypes:'所有类型',nTypes:n=>`${n} 种类型`,removeFilter:(w,x)=>`移除${w}筛选：${x}`,clearFilters:'清除筛选',
+  noResults:'无结果',tryAgain:'请尝试其他搜索词或清除筛选。',sortNear:'按与你的距离排序',sortName:'按名称排序。点击“我的位置”查看最近的网点。',
+  filterByState:'按州筛选',cp:'邮编',noMatches:'没有匹配的结果。',copied:'地址已复制',copyFail:'无法复制地址',tilesFail:'无法加载街道地图，已显示简易地图。',
+  geoNo:'你的浏览器无法获取位置。',geoOk:'网点已按距离排序',geoDenied:'位置权限被拒绝。',geoFail:'无法获取你的位置。',
+  call:n=>`拨打 ${n}`,fromYou:d=>`距你 ${d}`,directions:'路线',copyAddr:'复制地址',official:'官方页面',gmaps:'在 Google 地图中打开',
+  capaLoading:'正在加载 CAPA…',capaNoMatch:'销售数据库中没有匹配的门店。',capaSub:'销量及 Honor 份额',capaMulti:'该州有多家同名门店，请确认是哪一家：',
+  lastDaysH:'最近天数',asOf:d=>`截至 ${d}`,last7:'最近 7 天',last30:'最近 30 天',last365:'最近 365 天',calH:'当前日历周期',calSub:'周一至周日',weekN:n=>`第 ${n} 周 (W${n})`,monthOf:m=>m,
+  honorTitle:(h,v)=>`${v} 台中有 ${h} 台为 Honor`,noSales365:'最近 365 天没有销售。',
+  err_offline:'CAPA 不可用（请通过可访问 SQL 的服务器打开地图）。',err_bad:'无效的门店。',err_nosql:'缺少 SQL 连接（COPPEL_SQL 或 acceso/sql.txt）。',err_sql:'无法查询 SQL。',
+  types:['Coppel 门店','Coppel Canadá','BanCoppel','Afore Coppel','ATM','摩托车','仓库','Fashion Market','其他','无销售'],
+  rnames:{1:'Baja California、BCS 和 San Luis Río Colorado',2:'Sonora 和 Sinaloa',3:'Chihuahua、Durango 和 La Laguna',4:'Nuevo León、Tamaulipas 和 Coahuila',5:'Jalisco、Colima、Michoacán 和 Nayarit',6:'Bajío 和中北部',7:'Puebla、Veracruz、Oaxaca、Guerrero 和 Tlaxcala',8:'东南部',9:'墨西哥城、墨西哥州、Hidalgo 和 Morelos'}}
+};
+let LANG=(()=>{try{const l=localStorage.getItem('coppel-map:lang');if(I18N[l])return l}catch(e){}return 'es'})();
+const LOC=()=>I18N[LANG].loc;
+const t=(k,...a)=>{const v=I18N[LANG][k]??I18N.es[k];return typeof v==='function'?v(...a):v};
+const tn=k=>I18N[LANG].types[k];
+const rn=k=>I18N[LANG].rnames[k];
+function applyStatic(){
+  document.documentElement.lang=LOC();document.title=t('title');
+  document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=t(e.dataset.i18n));
+  document.querySelectorAll('[data-i18n-ph]').forEach(e=>e.placeholder=t(e.dataset.i18nPh));
+  document.querySelectorAll('[data-i18n-aria]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.i18nAria)));
+  document.querySelectorAll('[data-i18n-title]').forEach(e=>e.title=t(e.dataset.i18nTitle));
+}
+
 /* ── utilidades ── */
 const $=id=>document.getElementById(id);
 const root=document.documentElement;
 const css=n=>getComputedStyle(root).getPropertyValue(n).trim();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm=s=>String(s).normalize('NFD').replace(/\p{M}/gu,'').toLowerCase();
-const fmt=n=>n.toLocaleString('es-MX');
+const fmt=n=>n.toLocaleString(LOC());
 const store={get(k){try{return localStorage.getItem('coppel-map:'+k)}catch(e){return null}},set(k,v){try{localStorage.setItem('coppel-map:'+k,v)}catch(e){}}};
 const mqMobile=matchMedia('(max-width:760px)'), mqDark=matchMedia('(prefers-color-scheme: dark)'), mqReduce=matchMedia('(prefers-reduced-motion: reduce)');
 const isMobile=()=>mqMobile.matches;
@@ -1231,36 +1308,36 @@ const kmTxt=k=>k<1?Math.round(k*1000)+' m':k<10?k.toFixed(1)+' km':fmt(Math.roun
 const kmOf=i=>S.me?dist(S.me[0],S.me[1],D[i][5],D[i][6]):null;
 function popupHTML(i){
   const r=D[i], m=M[i];
-  const badges=TYPES.map((t,k)=>m&(1<<k)?`<span class="bdg${k===0?' bdg-store':''}">${esc(t)}</span>`:'').join('');
+  const badges=TYPES.map((_,k)=>m&(1<<k)?`<span class="bdg${k===0?' bdg-store':''}">${esc(tn(k))}</span>`:'').join('');
   const ll=r[5]+','+r[6];
   const tel=r[8]?String(r[8]).replace(/[^\d+]/g,''):'';
   const addr=`${r[1]}, ${r[2]}, ${r[3]}, CP ${r[4]}`;
   const off=officialURL(i), km=kmOf(i);
   return `<article class="pp">
-<div class="pp-top"><span class="bdg rb" style="--c:${RCOL[r[9]]}" title="${esc(RNAME[r[9]])}">Región R${r[9]}</span>${badges}</div>
+<div class="pp-top"><span class="bdg rb" style="--c:${RCOL[r[9]]}" title="${esc(rn(r[9]))}">${t('regionBadge',r[9])}</span>${badges}</div>
 <h2>${esc(r[0])}</h2>
-<p class="pp-addr">${esc(r[1])}<br>${esc(r[2])}, ${esc(r[3])} · CP ${esc(r[4])}</p>
-${tel?`<a class="pp-tel" href="tel:${esc(tel)}" aria-label="Llamar al ${esc(r[8])}">${ICON.phone}${esc(r[8])}</a>`:''}${km!=null?`<span class="pp-km">a ${kmTxt(km)} de ti</span>`:''}
-${m&513?`<div class="pp-capa" data-i="${i}">${SN[i]?(capaCache.has(SN[i])?capaHTML(capaCache.get(SN[i])):'<span class="capa-msg">Cargando CAPA…</span>'):'<span class="capa-msg">Sin coincidencia en la base de ventas.</span>'}</div>`:''}
-<div class="pp-act"><a class="btn pri" href="https://www.google.com/maps/dir/?api=1&destination=${ll}" target="_blank" rel="noopener">${ICON.route}Cómo llegar</a><button class="btn" type="button" data-copy="${esc(addr)}">${ICON.copy}Copiar dirección</button></div>
-<div class="pp-foot">${off?`<a href="${esc(off)}" target="_blank" rel="noopener">Ver ficha oficial</a>`:''}<a href="https://www.google.com/maps/search/?api=1&query=${ll}" target="_blank" rel="noopener">Abrir en Google Maps</a><span class="coords">${r[5].toFixed(5)}, ${r[6].toFixed(5)}</span></div>
+<p class="pp-addr">${esc(r[1])}<br>${esc(r[2])}, ${esc(r[3])} · ${t('cp')} ${esc(r[4])}</p>
+${tel?`<a class="pp-tel" href="tel:${esc(tel)}" aria-label="${esc(t('call',r[8]))}">${ICON.phone}${esc(r[8])}</a>`:''}${km!=null?`<span class="pp-km">${t('fromYou',kmTxt(km))}</span>`:''}
+${m&513?`<div class="pp-capa" data-i="${i}">${SN[i]?(capaCache.has(SN[i])?capaHTML(capaCache.get(SN[i])):`<span class="capa-msg">${t('capaLoading')}</span>`):`<span class="capa-msg">${t('capaNoMatch')}</span>`}</div>`:''}
+<div class="pp-act"><a class="btn pri" href="https://www.google.com/maps/dir/?api=1&destination=${ll}" target="_blank" rel="noopener">${ICON.route}${t('directions')}</a><button class="btn" type="button" data-copy="${esc(addr)}">${ICON.copy}${t('copyAddr')}</button></div>
+<div class="pp-foot">${off?`<a href="${esc(off)}" target="_blank" rel="noopener">${t('official')}</a>`:''}<a href="https://www.google.com/maps/search/?api=1&query=${ll}" target="_blank" rel="noopener">${t('gmaps')}</a><span class="coords">${r[5].toFixed(5)}, ${r[6].toFixed(5)}</span></div>
 </article>`;
 }
 // CAPA: unidades vendidas (sell-out) en ventanas de 7/30/365 días hasta el último día con datos.
 const capaCache=new Map();
-const fdate=s=>new Date(s+'T00:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+const fdate=s=>new Date(s+'T00:00:00').toLocaleDateString(LOC(),{day:'numeric',month:'short',year:'numeric'});
 function capaHTML(d){
-  if(d.error)return `<span class="capa-msg">${esc(d.error)}</span>`;
-  const pct=(h,v)=>v?(100*h/v).toLocaleString('es-MX',{minimumFractionDigits:1,maximumFractionDigits:1})+'%':'—';
-  const cell=([k,v,h,sub])=>`<div><span>${k}</span><strong>${fmt(v||0)}</strong><i class="capa-h-share" title="${fmt(h||0)} de ${fmt(v||0)} unidades fueron Honor">Honor ${pct(h||0,v)}</i>${sub?`<em>${sub}</em>`:''}</div>`;
+  if(d.error)return `<span class="capa-msg">${esc(d.code?t('err_'+d.code):d.error)}</span>`;
+  const pct=(h,v)=>v?(100*h/v).toLocaleString(LOC(),{minimumFractionDigits:1,maximumFractionDigits:1})+'%':'—';
+  const cell=([k,v,h,sub])=>`<div><span>${k}</span><strong>${fmt(v||0)}</strong><i class="capa-h-share" title="${esc(t('honorTitle',fmt(h||0),fmt(v||0)))}">Honor ${pct(h||0,v)}</i>${sub?`<em>${sub}</em>`:''}</div>`;
   const dd=s=>new Date(s+'T00:00:00');
-  const dm=x=>x.toLocaleDateString('es-MX',{day:'numeric',month:'short'});
-  const rng=(a,b)=>{const x=dd(a),y=dd(b);return `${x.getMonth()===y.getMonth()?x.getDate():dm(x)}–${dm(y)}`};
-  const mesN=d.ini_mes?dd(d.ini_mes).toLocaleDateString('es-MX',{month:'long'}):'';
+  const dfm=new Intl.DateTimeFormat(LOC(),{day:'numeric',month:'short'});
+  const rng=(a,b)=>{const x=dd(a),y=dd(b);try{return dfm.formatRange(x,y)}catch(e){return dfm.format(x)+'–'+dfm.format(y)}};
+  const mesN=d.ini_mes?dd(d.ini_mes).toLocaleDateString(LOC(),{month:'long'}):'';
   const sec=s=>`<div class="capa-sec">${s}</div>`;
-  const rows=d.tiendas.map(t=>`<div class="capa-t">${d.tiendas.length>1?`<b>#${esc(t.num)} ${esc(t.nombre)}</b>`:''}${d.hasta?sec(`Últimos días <span>· al ${fdate(d.hasta)}</span>`):''}<div class="capa-g">${[['Últimos 7 días',t.semana,t.h_semana],['Últimos 30 días',t.mes,t.h_mes],['Últimos 365 días',t.ano,t.h_ano]].map(cell).join('')}</div>${d.hasta?`${sec('Calendario en curso <span>· semana lun–dom</span>')}<div class="capa-g capa-cal">${[['Semana W'+d.isow,t.semana_cal,t.h_semana_cal,rng(d.ini_sem,d.hasta)],['Mes de '+mesN,t.mes_cal,t.h_mes_cal,rng(d.ini_mes,d.hasta)]].map(cell).join('')}</div>`:''}</div>`).join('');
+  const rows=d.tiendas.map(x=>`<div class="capa-t">${d.tiendas.length>1?`<b>#${esc(x.num)} ${esc(x.nombre)}</b>`:''}${d.hasta?sec(`${t('lastDaysH')} <span>· ${t('asOf',fdate(d.hasta))}</span>`):''}<div class="capa-g">${[[t('last7'),x.semana,x.h_semana],[t('last30'),x.mes,x.h_mes],[t('last365'),x.ano,x.h_ano]].map(cell).join('')}</div>${d.hasta?`${sec(`${t('calH')} <span>· ${t('calSub')}</span>`)}<div class="capa-g capa-cal">${[[t('weekN',d.isow),x.semana_cal,x.h_semana_cal,rng(d.ini_sem,d.hasta)],[t('monthOf',mesN),x.mes_cal,x.h_mes_cal,rng(d.ini_mes,d.hasta)]].map(cell).join('')}</div>`:''}</div>`).join('');
   const one=d.tiendas.length===1?` · #${esc(d.tiendas[0].num)} ${esc(d.tiendas[0].nombre)}`:'';
-  return `<div class="capa-h">CAPA <small>unidades vendidas y % Honor${one}</small></div>${d.tiendas.length>1?'<p class="capa-msg">Varias tiendas con este nombre en el estado; revisa cuál es:</p>':''}${rows}${d.hasta?'':'<p class="capa-msg">Sin ventas en los últimos 365 días.</p>'}`;
+  return `<div class="capa-h">CAPA <small>${t('capaSub')}${one}</small></div>${d.tiendas.length>1?`<p class="capa-msg">${t('capaMulti')}</p>`:''}${rows}${d.hasta?'':`<p class="capa-msg">${t('noSales365')}</p>`}`;
 }
 function loadCapa(i){
   const t=SN[i];
@@ -1270,7 +1347,7 @@ function loadCapa(i){
   fetch('api/capa?t='+encodeURIComponent(t),{credentials:'same-origin'})
     .then(r=>r.ok?r.json():Promise.reject(r.status))
     .then(put)
-    .catch(()=>put({error:'CAPA no disponible (abre el mapa desde el servidor con acceso a SQL).'}));
+    .catch(()=>put({error:true,code:'offline'}));
 }
 function rowMatches(i){
   return !!(M[i]&typeMask())&&(!S.state||D[i][3]===S.state)&&(!S.region||D[i][9]===S.region)&&(!S.q.trim()||hay[i].includes(norm(S.q.trim())));
@@ -1314,38 +1391,40 @@ function markActive(){
 
 /* ── filtros: construcción ── */
 function fillStates(){
-  stEl.innerHTML='<option value="">Todos los estados</option>'+states.map(s=>`<option value="${esc(s)}">${esc(s)} (${stRegsLbl(s)})</option>`).join('');
+  stEl.innerHTML=`<option value="">${t('allStates')}</option>`+states.map(s=>`<option value="${esc(s)}">${esc(s)} (${stRegsLbl(s)})</option>`).join('');
 }
 fillStates();
-const rchips=$('rchips');
-rchips.innerHTML=`<button type="button" class="chip rchip" data-r="0" aria-pressed="true">Todas</button>`+[1,2,3,4,5,6,7,8,9].map(k=>`<button type="button" class="chip rchip" data-r="${k}" style="--c:${RCOL[k]}" aria-pressed="false" title="R${k} · ${esc(RNAME[k])}" aria-label="Región ${k}: ${esc(RNAME[k])}"><i></i>R${k}</button>`).join('');
+const rchips=$('rchips'), chips=$('chips');
+function buildFilters(){
+rchips.innerHTML=`<button type="button" class="chip rchip" data-r="0" aria-pressed="true">${t('allRegions')}</button>`+[1,2,3,4,5,6,7,8,9].map(k=>`<button type="button" class="chip rchip" data-r="${k}" style="--c:${RCOL[k]}" aria-pressed="false" title="R${k} · ${esc(rn(k))}" aria-label="${esc(t('regionAria',k,rn(k)))}"><i></i>R${k}</button>`).join('');
+chips.innerHTML=TYPES.map((_,k)=>`<button type="button" class="chip" data-k="${k}" aria-pressed="false">${esc(tn(k))} <em>${fmt(typeCount[k])}</em></button>`).join('');
+$('rgLegend').innerHTML=`<b>${t('cellRegions')}</b>`+[1,2,3,4,5,6,7,8,9].map(k=>`<span title="${esc(rn(k))}"><span class="sw" style="--c:${RCOL[k]}"></span>R${k}</span>`).join('');
+}
 rchips.addEventListener('click',e=>{const b=e.target.closest('.rchip');if(!b)return;const r=+b.dataset.r;S.region=S.region===r?0:r;update(true)});
-const chips=$('chips');
-chips.innerHTML=TYPES.map((t,k)=>`<button type="button" class="chip" data-k="${k}" aria-pressed="false">${esc(t)} <em>${fmt(typeCount[k])}</em></button>`).join('');
 chips.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const k=+b.dataset.k;
-  if(S.types.has(k)){if(S.types.size>1)S.types.delete(k);else toast('Debe quedar al menos un tipo activo')}else S.types.add(k);
+  if(S.types.has(k)){if(S.types.size>1)S.types.delete(k);else toast(t('atLeastOne'))}else S.types.add(k);
   update(false)});
 $('allTypes').addEventListener('click',()=>{S.types=new Set(S.types.size===TYPES.length?DEF_TYPES:TYPES.map((_,k)=>k));update(false)});
-$('rgLegend').innerHTML='<b>Regiones celulares (IFT)</b>'+[1,2,3,4,5,6,7,8,9].map(k=>`<span title="${esc(RNAME[k])}"><span class="sw" style="--c:${RCOL[k]}"></span>R${k}</span>`).join('');
+buildFilters();
 
 /* ── render ── */
 function syncControls(){
   rchips.querySelectorAll('.rchip').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.r===S.region));
-  $('rname').textContent=S.region?'R'+S.region+' · '+RNAME[S.region]:'Las 9 regiones celulares del IFT (las que usa Telcel).';
+  $('rname').textContent=S.region?'R'+S.region+' · '+rn(S.region):t('rnameAll');
   chips.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',S.types.has(+b.dataset.k)));
-  $('allTypes').textContent=S.types.size===TYPES.length?'Solo tiendas':'Ver todos';
+  $('allTypes').textContent=S.types.size===TYPES.length?t('onlyStores'):t('seeAll');
   stEl.value=S.state;colorEl.checked=S.color;
   if(document.activeElement!==qEl&&qEl.value!==S.q)qEl.value=S.q;
   $('qClear').hidden=!qEl.value;$('searchBox').classList.toggle('has-q',!!qEl.value);
   $('rgLegend').hidden=!S.color;
   // píldoras de filtros activos
   const pills=[];
-  if(S.q.trim())pills.push(['q','“'+S.q.trim()+'”','búsqueda']);
-  if(S.region)pills.push(['r','Región R'+S.region,'región']);
-  if(S.state)pills.push(['e',S.state,'estado']);
-  if(!typesDefault())pills.push(['t',S.types.size===TYPES.length?'Todos los tipos':S.types.size===1?TYPES[[...S.types][0]]:S.types.size+' tipos','tipos']);
+  if(S.q.trim())pills.push(['q','“'+S.q.trim()+'”',t('wSearch')]);
+  if(S.region)pills.push(['r',t('regionBadge',S.region),t('wRegion')]);
+  if(S.state)pills.push(['e',S.state,t('wState')]);
+  if(!typesDefault())pills.push(['t',S.types.size===TYPES.length?t('allTypes'):S.types.size===1?tn([...S.types][0]):t('nTypes',S.types.size),t('wTypes')]);
   const el=$('pills');el.hidden=!pills.length;
-  el.innerHTML=pills.map(([k,t,w])=>`<button type="button" class="pill" data-p="${k}" aria-label="Quitar filtro de ${w}: ${esc(t)}"><span>${esc(t)}</span>${ICON.x}</button>`).join('')+(pills.length?'<button type="button" class="clear" id="clearAll">Limpiar filtros</button>':'');
+  el.innerHTML=pills.map(([k,x,w])=>`<button type="button" class="pill" data-p="${k}" aria-label="${esc(t('removeFilter',w,x))}"><span>${esc(x)}</span>${ICON.x}</button>`).join('')+(pills.length?`<button type="button" class="clear" id="clearAll">${t('clearFilters')}</button>`:'');
 }
 $('pills').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
@@ -1358,14 +1437,14 @@ function clearAll(){S.q='';qEl.value='';S.region=0;S.state='';S.types=new Set(DE
 
 function renderSummary(by){
   const list=$('list'), ent=Object.entries(by), max=Math.max(1,...Object.values(by));
-  if(!ent.length){list.innerHTML='<div class="empty-state"><b>Sin resultados</b>Prueba con otra búsqueda o limpia los filtros.</div>';return}
+  if(!ent.length){list.innerHTML=`<div class="empty-state"><b>${t('noResults')}</b>${t('tryAgain')}</div>`;return}
   if(S.group==='state')ent.sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'es'));else ent.sort((a,b)=>a[0]-b[0]);
   list.innerHTML=ent.map(([s,n])=>{
     const w=(n/max*100).toFixed(1);
     if(S.group==='state'){const on=S.state===s;
       return `<button type="button" class="row${on?' on':''}" data-s="${esc(s)}" aria-pressed="${on}"><span class="nm">${esc(s)} <span class="rs">· ${stRegsLbl(s)}</span></span><span class="n">${fmt(n)}</span><span class="track"><span class="bar" style="width:${w}%"></span></span></button>`}
     const on=S.region===+s;
-    return `<button type="button" class="row${on?' on':''}" data-r="${s}" aria-pressed="${on}"><span class="nm"><span class="sw" style="--c:${RCOL[s]}"></span>Región ${s}</span><span class="n">${fmt(n)}</span><span class="rs2">${esc(RNAME[s])}</span><span class="track"><span class="bar" style="width:${w}%;background:${RCOL[s]}"></span></span></button>`;
+    return `<button type="button" class="row${on?' on':''}" data-r="${s}" aria-pressed="${on}"><span class="nm"><span class="sw" style="--c:${RCOL[s]}"></span>${t('regionN',s)}</span><span class="n">${fmt(n)}</span><span class="rs2">${esc(rn(s))}</span><span class="track"><span class="bar" style="width:${w}%;background:${RCOL[s]}"></span></span></button>`;
   }).join('');
 }
 $('list').addEventListener('click',e=>{const b=e.target.closest('.row');if(!b)return;
@@ -1376,17 +1455,17 @@ let sorted=[];
 function renderStores(){
   if(S.tab!=='ubic')return;
   const el=$('stores'), more=$('more'), note=$('sortNote');
-  if(!shown.length){el.innerHTML='<div class="empty-state"><b>Sin resultados</b>Prueba con otra búsqueda o limpia los filtros.</div>';more.hidden=true;note.hidden=true;return}
+  if(!shown.length){el.innerHTML=`<div class="empty-state"><b>${t('noResults')}</b>${t('tryAgain')}</div>`;more.hidden=true;note.hidden=true;return}
   note.hidden=false;
-  if(S.me){const dm=new Map(shown.map(i=>[i,kmOf(i)]));sorted=[...shown].sort((a,b)=>dm.get(a)-dm.get(b));note.innerHTML=ICON.near+'Ordenadas por cercanía a tu ubicación'}
-  else{sorted=[...shown].sort((a,b)=>rank[a]-rank[b]);note.textContent='Ordenadas por nombre. Usa «Mi ubicación» para ver las más cercanas.'}
+  if(S.me){const dm=new Map(shown.map(i=>[i,kmOf(i)]));sorted=[...shown].sort((a,b)=>dm.get(a)-dm.get(b));note.innerHTML=ICON.near+esc(t('sortNear'))}
+  else{sorted=[...shown].sort((a,b)=>rank[a]-rank[b]);note.textContent=t('sortName')}
   const n=Math.min(S.limit,sorted.length);
   let h='';
   for(let j=0;j<n;j++){const i=sorted[j], r=D[i], km=S.me?kmOf(i):null;
     h+=`<button type="button" class="store${i===S.sel?' on':''}" data-i="${i}"><span class="d${M[i]&1?' s':M[i]&512?' n':''}"></span><span class="sn">${esc(r[0])}</span><span class="meta"><span class="rbadge" style="--c:${RCOL[r[9]]}">R${r[9]}</span>${km!=null?`<span class="km">${kmTxt(km)}</span>`:''}</span><span class="sa">${esc(r[1])} · ${esc(r[2])}, ${esc(r[3])}</span></button>`}
   el.innerHTML=h;
   more.hidden=n>=sorted.length;
-  if(!more.hidden)more.textContent=`Mostrar más (${fmt(n)} de ${fmt(sorted.length)})`;
+  if(!more.hidden)more.textContent=t('showMoreN',fmt(n),fmt(sorted.length));
 }
 $('stores').addEventListener('click',e=>{const b=e.target.closest('.store');if(b)select(+b.dataset.i,true)});
 $('more').addEventListener('click',()=>{S.limit+=PAGE;renderStores()});
@@ -1409,7 +1488,7 @@ function update(doFit){
   if(S.sel>=0&&!vis[S.sel]){map.closePopup(pop);S.sel=-1}
   placeRing();if(meDot)meDot.bringToFront();
   $('count').textContent=fmt(shown.length);$('openCount').textContent=fmt(shown.length);$('tabCount').textContent=fmt(shown.length);
-  $('countLbl').textContent=shown.length===1?'ubicación visible':'ubicaciones visibles';
+  $('countLbl').textContent=shown.length===1?t('visible1'):t('visibleN');
   $('kStates').textContent=sts.size;$('kRegions').textContent=rgs.size;
   S.limit=PAGE;
   syncControls();renderSummary(by);renderStores();
@@ -1445,10 +1524,10 @@ function suggest(){
   const pick=[].concat(...b.map(a=>a.sort((x,y)=>rank[x]-rank[y]))).slice(0,8-st.length).map(i=>({k:'s',i}));
   sugItems=st.concat(pick);sugIdx=-1;
   sug.innerHTML=sugItems.length?sugItems.map((it,j)=>{
-    if(it.k==='e')return `<li role="option" id="sg${j}" data-j="${j}" aria-selected="false"><span class="si">${ICON.pin}</span><span><span class="sn" style="display:block">${hl(it.s,q)}</span><span class="sa" style="display:block">Filtrar por estado · ${stRegsLbl(it.s)}</span></span><span class="sk">Estado</span></li>`;
+    if(it.k==='e')return `<li role="option" id="sg${j}" data-j="${j}" aria-selected="false"><span class="si">${ICON.pin}</span><span><span class="sn" style="display:block">${hl(it.s,q)}</span><span class="sa" style="display:block">${t('filterByState')} · ${stRegsLbl(it.s)}</span></span><span class="sk">${t('state')}</span></li>`;
     const r=D[it.i];
-    return `<li role="option" id="sg${j}" data-j="${j}" aria-selected="false"><span class="si"><i class="${M[it.i]&1?'s':M[it.i]&512?'n':''}"></i></span><span style="min-width:0"><span class="sn" style="display:block">${hl(r[0],q)}</span><span class="sa" style="display:block">${hl(r[2]+', '+r[3]+' · CP '+r[4],q)}</span></span><span class="rbadge" style="--c:${RCOL[r[9]]}">R${r[9]}</span></li>`;
-  }).join(''):'<li class="empty" role="presentation">Sin coincidencias para esa búsqueda.</li>';
+    return `<li role="option" id="sg${j}" data-j="${j}" aria-selected="false"><span class="si"><i class="${M[it.i]&1?'s':M[it.i]&512?'n':''}"></i></span><span style="min-width:0"><span class="sn" style="display:block">${hl(r[0],q)}</span><span class="sa" style="display:block">${hl(r[2]+', '+r[3]+' · '+t('cp')+' '+r[4],q)}</span></span><span class="rbadge" style="--c:${RCOL[r[9]]}">R${r[9]}</span></li>`;
+  }).join(''):`<li class="empty" role="presentation">${t('noMatches')}</li>`;
   sug.hidden=false;qEl.setAttribute('aria-expanded','true');
 }
 function closeSug(){sug.hidden=true;sugItems=[];sugIdx=-1;qEl.setAttribute('aria-expanded','false');qEl.removeAttribute('aria-activedescendant')}
@@ -1492,7 +1571,7 @@ async function copyText(s){
   try{await navigator.clipboard.writeText(s);return true}catch(e){}
   try{const ta=document.createElement('textarea');ta.value=s;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}
 }
-document.addEventListener('click',async e=>{const b=e.target.closest('[data-copy]');if(!b)return;toast(await copyText(b.dataset.copy)?'Dirección copiada':'No se pudo copiar la dirección')});
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-copy]');if(!b)return;toast(await copyText(b.dataset.copy)?t('copied'):t('copyFail'))});
 
 /* ── panel: ocultar en escritorio, hoja inferior en móvil ── */
 function showPanel(on){
@@ -1554,7 +1633,7 @@ function setBase(b,auto){
     if(!tiles){
       tiles=L.tileLayer(tileURL(),{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'});
       tiles.on('tileload',()=>tOk++);
-      tiles.on('tileerror',()=>{tErr++;if(!tOk&&tErr>=4&&S.base==='calles'){const quiet=baseAuto;setBase('simple',true);if(!quiet)toast('No se pudo cargar el mapa de calles; se muestra el mapa simple.')}});
+      tiles.on('tileerror',()=>{tErr++;if(!tOk&&tErr>=4&&S.base==='calles'){const quiet=baseAuto;setBase('simple',true);if(!quiet)toast(t('tilesFail'))}});
     }
     tOk=0;tErr=0;tiles.addTo(map);tintTiles();
   }else if(tiles)tiles.remove();
@@ -1564,7 +1643,7 @@ $('baseSimple').onclick=()=>setBase('simple');$('baseCalles').onclick=()=>setBas
 
 function restyle(){
   const d=isDark(), tb=$('theme');
-  tb.innerHTML=d?ICON.sun:ICON.moon;tb.setAttribute('aria-label',d?'Cambiar a modo claro':'Cambiar a modo oscuro');
+  tb.innerHTML=d?ICON.sun:ICON.moon;tb.setAttribute('aria-label',d?t('toLight'):t('toDark'));
   stateLayer.setStyle(stStyle);
   markers.forEach((m,i)=>m.setStyle(mStyle(i)));
   tintTiles();
@@ -1580,7 +1659,7 @@ $('zin').onclick=()=>map.zoomIn();$('zout').onclick=()=>map.zoomOut();
 $('reset').onclick=()=>{map.closePopup();fit()};
 $('locate').addEventListener('click',()=>{
   const btn=$('locate');
-  if(!navigator.geolocation){toast('Tu navegador no permite obtener la ubicación.');return}
+  if(!navigator.geolocation){toast(t('geoNo'));return}
   btn.classList.add('busy');
   navigator.geolocation.getCurrentPosition(p=>{
     btn.classList.remove('busy');btn.setAttribute('aria-pressed','true');
@@ -1595,10 +1674,10 @@ $('locate').addEventListener('click',()=>{
     const pd=pads(), z=Math.max(map.getZoom(),11);
     const c=map.unproject(map.project(L.latLng(ll),z).subtract([(pd.tl[0]-pd.br[0])/2,(pd.tl[1]-pd.br[1])/2]),z);
     if(mqReduce.matches)map.setView(c,z,{animate:false});else map.flyTo(c,z,{duration:.9});
-    toast('Ubicaciones ordenadas por cercanía');
+    toast(t('geoOk'));
   },err=>{
     btn.classList.remove('busy');
-    toast(err&&err.code===1?'Permiso de ubicación denegado.':'No se pudo obtener tu ubicación.');
+    toast(err&&err.code===1?t('geoDenied'):t('geoFail'));
   },{enableHighAccuracy:true,timeout:10000,maximumAge:60000});
 });
 
@@ -1607,6 +1686,9 @@ const savedTheme=store.get('theme');
 if(!root.getAttribute('data-theme')&&(savedTheme==='dark'||savedTheme==='light'))root.setAttribute('data-theme',savedTheme);
 readHash();
 qEl.value=S.q;
+applyStatic();
+$('lang').value=LANG;
+$('lang').addEventListener('change',e=>setLang(e.target.value));
 legendOpen(!isMobile());
 setSnap('collapsed');
 restyle();
@@ -1614,6 +1696,11 @@ restyle();
 setBase('simple',true);map.setMaxBounds(MX.pad(.25));
 update(false);
 fit();
+function setLang(l){
+  if(!I18N[l])return;LANG=l;store.set('lang',l);$('lang').value=l;
+  applyStatic();fillStates();stEl.value=S.state;buildFilters();restyle();update(false);
+  if(S.sel>=0&&map.hasLayer(pop))pop.setContent(popupHTML(S.sel));
+}
 addEventListener('hashchange',()=>{if(location.hash.replace(/^#/,'')===lastHash)return;readHash();qEl.value=S.q;update(true)});
 // las fuentes web cambian la altura de la hoja contraída
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(isMobile())setSnap(snap)});

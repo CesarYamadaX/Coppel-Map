@@ -116,7 +116,7 @@ def sql_conn_str():
 def capa(t):
     nums = [n for n in t.split(",") if n.isdigit() and len(n) <= 5][:3]
     if not nums:
-        return {"error": "Tienda no válida."}
+        return {"error": "Tienda no válida.", "code": "bad"}
     key = ",".join(nums)
     with lock:
         hit = capa_cache.get(key)
@@ -124,7 +124,7 @@ def capa(t):
         return hit[1]
     cs = sql_conn_str()
     if not cs:
-        return {"error": "Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt)."}
+        return {"error": "Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt).", "code": "nosql"}
     try:
         import pyodbc
         with pyodbc.connect(cs, timeout=10) as cn:
@@ -134,7 +134,7 @@ def capa(t):
                         [n + " %" for n in nums] + [mx, ws, ms])
             rows = cur.fetchall()
     except Exception:
-        return {"error": "No se pudo consultar SQL."}
+        return {"error": "No se pudo consultar SQL.", "code": "sql"}
     by = {r.num: r for r in rows}
     tiendas = []
     for n in nums:
