@@ -1037,6 +1037,25 @@ h1{background:linear-gradient(90deg,var(--fg),var(--accent));-webkit-background-
 .toast{background:var(--grad);color:var(--accent-fg);transform:translate(-50%,18px) scale(.9);transition:opacity .25s,transform .35s var(--spring)}
 .toast.show{transform:translate(-50%,0) scale(1)}
 
+/* Carga: esqueleto de CAPA, aviso de ventas y barra del panel más rápida */
+.skel{display:flex;flex-direction:column;gap:7px}
+.skel i{display:block;border-radius:6px;background:linear-gradient(90deg,var(--line) 25%,color-mix(in srgb,var(--line) 40%,var(--panel)) 50%,var(--line) 75%);background-size:300% 100%;animation:shimmer 1.3s ease-in-out infinite}
+.sk-h{width:62%;height:13px}.sk-l{width:42%;height:9px;margin-top:3px}
+.sk-g{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sk-g.sk-2{grid-template-columns:repeat(2,1fr)}
+.sk-g i{height:44px;border-radius:8px}
+.sk-g i:nth-child(2){animation-delay:.12s}.sk-g i:nth-child(3){animation-delay:.24s}
+@keyframes shimmer{from{background-position:100% 0}to{background-position:-200% 0}}
+.sales-load{position:fixed;z-index:30;bottom:16px;right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:9px;height:38px;padding:0 15px 0 13px;border-radius:999px;font-weight:600;font-size:12.5px;color:var(--fg);animation:salesIn .35s var(--spring)}
+.sales-load.out{animation:fadeOut .3s var(--ease) forwards}
+.dots{display:inline-flex;gap:4px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--brand);animation:dot 1s ease-in-out infinite}
+.dots i:nth-child(2){animation-delay:.15s;background:#ffb800}.dots i:nth-child(3){animation-delay:.3s;background:var(--accent)}
+@keyframes dot{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-5px);opacity:1}}
+@keyframes salesIn{from{opacity:0;transform:translateY(10px) scale(.95)}}
+@keyframes fadeOut{to{opacity:0;transform:translateY(8px)}}
+.panel.loading::before{animation-duration:1.1s}
+@media (max-width:760px){.sales-load{left:0;right:0;margin:0 auto;width:max-content;bottom:calc(var(--sheet) + 12px)}}
+
 .leaflet-popup-content-wrapper{background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);overflow:hidden;transform-origin:50% 100%;animation:popupIn .35s var(--spring)}
 .leaflet-popup-content-wrapper::before{content:"";display:block;height:4px;background:linear-gradient(90deg,var(--brand),var(--accent))}
 @keyframes popupIn{from{opacity:0;transform:translateY(10px) scale(.92)}}
@@ -1218,6 +1237,7 @@ h1{background:linear-gradient(90deg,var(--fg),var(--accent));-webkit-background-
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="sales-load float" id="salesLoad" role="status" hidden><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span data-i18n="loadingSales">Cargando ventas…</span></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
@@ -1248,7 +1268,7 @@ es:{loc:'es-MX',title:'Mapa de tiendas Coppel',mapAria:'Mapa de ubicaciones Copp
   filterByState:'Filtrar por estado',cp:'CP',noMatches:'Sin coincidencias para esa búsqueda.',copied:'Dirección copiada',copyFail:'No se pudo copiar la dirección',tilesFail:'No se pudo cargar el mapa de calles; se muestra el mapa simple.',
   geoNo:'Tu navegador no permite obtener la ubicación.',geoOk:'Ubicaciones ordenadas por cercanía',geoDenied:'Permiso de ubicación denegado.',geoFail:'No se pudo obtener tu ubicación.',
   call:n=>`Llamar al ${n}`,fromYou:d=>`a ${d} de ti`,directions:'Cómo llegar',copyAddr:'Copiar dirección',official:'Ver ficha oficial',gmaps:'Abrir en Google Maps',
-  capaLoading:'Cargando CAPA…',capaNoMatch:'Sin coincidencia en la base de ventas.',capaSub:'unidades vendidas y % Honor',capaMulti:'Varias tiendas con este nombre en el estado; revisa cuál es:',
+  capaLoading:'Cargando CAPA…',loadingSales:'Cargando ventas…',capaNoMatch:'Sin coincidencia en la base de ventas.',capaSub:'unidades vendidas y % Honor',capaMulti:'Varias tiendas con este nombre en el estado; revisa cuál es:',
   lastDaysH:'Últimos días',asOf:d=>`al ${d}`,last7:'Últimos 7 días',last30:'Últimos 30 días',last365:'Últimos 365 días',calH:'Calendario en curso',calSub:'semana lun–dom',weekN:n=>`Semana W${n}`,monthOf:m=>`Mes de ${m}`,
   honorTitle:(h,v)=>`${h} de ${v} unidades fueron Honor`,noSales365:'Sin ventas en los últimos 365 días.',
   err_offline:'CAPA no disponible (abre el mapa desde el servidor con acceso a SQL).',err_bad:'Tienda no válida.',err_nosql:'Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt).',err_sql:'No se pudo consultar SQL.',
@@ -1267,7 +1287,7 @@ en:{loc:'en-US',title:'Coppel store map',mapAria:'Map of Coppel locations in Mex
   filterByState:'Filter by state',cp:'ZIP',noMatches:'No matches for that search.',copied:'Address copied',copyFail:'Could not copy the address',tilesFail:'Could not load the street map; showing the simple map.',
   geoNo:'Your browser cannot get your location.',geoOk:'Locations sorted by distance',geoDenied:'Location permission denied.',geoFail:'Could not get your location.',
   call:n=>`Call ${n}`,fromYou:d=>`${d} from you`,directions:'Directions',copyAddr:'Copy address',official:'Official page',gmaps:'Open in Google Maps',
-  capaLoading:'Loading CAPA…',capaNoMatch:'No match in the sales database.',capaSub:'units sold and Honor share',capaMulti:'Several stores share this name in the state; check which one it is:',
+  capaLoading:'Loading CAPA…',loadingSales:'Loading sales…',capaNoMatch:'No match in the sales database.',capaSub:'units sold and Honor share',capaMulti:'Several stores share this name in the state; check which one it is:',
   lastDaysH:'Last days',asOf:d=>`as of ${d}`,last7:'Last 7 days',last30:'Last 30 days',last365:'Last 365 days',calH:'Current calendar',calSub:'week Mon–Sun',weekN:n=>`Week W${n}`,monthOf:m=>m[0].toUpperCase()+m.slice(1),
   honorTitle:(h,v)=>`${h} of ${v} units were Honor`,noSales365:'No sales in the last 365 days.',
   err_offline:'CAPA unavailable (open the map from the server with SQL access).',err_bad:'Invalid store.',err_nosql:'SQL connection missing (COPPEL_SQL or acceso/sql.txt).',err_sql:'Could not query SQL.',
@@ -1286,7 +1306,7 @@ zh:{loc:'zh-CN',title:'Coppel 门店地图',mapAria:'墨西哥 Coppel 网点地�
   filterByState:'按州筛选',cp:'邮编',noMatches:'没有匹配的结果。',copied:'地址已复制',copyFail:'无法复制地址',tilesFail:'无法加载街道地图，已显示简易地图。',
   geoNo:'你的浏览器无法获取位置。',geoOk:'网点已按距离排序',geoDenied:'位置权限被拒绝。',geoFail:'无法获取你的位置。',
   call:n=>`拨打 ${n}`,fromYou:d=>`距你 ${d}`,directions:'路线',copyAddr:'复制地址',official:'官方页面',gmaps:'在 Google 地图中打开',
-  capaLoading:'正在加载 CAPA…',capaNoMatch:'销售数据库中没有匹配的门店。',capaSub:'销量及 Honor 份额',capaMulti:'该州有多家同名门店，请确认是哪一家：',
+  capaLoading:'正在加载 CAPA…',loadingSales:'正在加载销量…',capaNoMatch:'销售数据库中没有匹配的门店。',capaSub:'销量及 Honor 份额',capaMulti:'该州有多家同名门店，请确认是哪一家：',
   lastDaysH:'最近天数',asOf:d=>`截至 ${d}`,last7:'最近 7 天',last30:'最近 30 天',last365:'最近 365 天',calH:'当前日历周期',calSub:'周一至周日',weekN:n=>`第 ${n} 周 (W${n})`,monthOf:m=>m,
   honorTitle:(h,v)=>`${v} 台中有 ${h} 台为 Honor`,noSales365:'最近 365 天没有销售。',
   err_offline:'CAPA 不可用（请通过可访问 SQL 的服务器打开地图）。',err_bad:'无效的门店。',err_nosql:'缺少 SQL 连接（COPPEL_SQL 或 acceso/sql.txt）。',err_sql:'无法查询 SQL。',
@@ -1414,22 +1434,41 @@ let curTier=tier(map.getZoom());
 const VSC=new Float32Array(D.length).fill(1);
 const rad=i=>RAD[curTier][M[i]&513?0:1]*VSC[i];
 function loadVentas(){
+  // aviso solo si tarda (la primera carga del servidor puede tomar ~30 s); no parpadea si responde rápido
+  const ld=$('salesLoad'), shw=setTimeout(()=>{ld.hidden=false;panel.classList.add('loading')},350);
+  const done=()=>{clearTimeout(shw);ld.classList.add('out');panel.classList.remove('loading');setTimeout(()=>{ld.hidden=true;ld.classList.remove('out')},300)};
   fetch('api/ventas',{credentials:'same-origin'}).then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{
+    done();
     if(!d||!d.t)return;
     // solo tiendas con número único: si el nombre coincide con varios números no se sabe cuál es (no se suman)
     const q={};for(const i in SN)if(!SN[i].includes(','))q[i]=d.t[SN[i]]||0;
     const vals=Object.values(q).filter(v=>v>0).sort((a,b)=>a-b);if(!vals.length)return;
     const top=vals[Math.floor(vals.length*.95)];
     for(const i in q)if(!(M[i]&512))VSC[i]=.75+1.15*Math.sqrt(Math.min(q[i]/top,1));
-    markers.forEach((m,i)=>m.setRadius(rad(i)));orderBySize();placeRing();
+    growMarkers();
     if(d.m){const qm={};for(const i in q)qm[i]=d.m[SN[i]]||0;MES=d.ini_mes&&d.hasta?[d.ini_mes,d.hasta]:null;buildTop(qm)}
-  }).catch(()=>{});
+  }).catch(done);
+}
+// los puntos pasan de su tamaño normal al tamaño por ventas con una transición corta
+let growTok=0;
+function growMarkers(){
+  const to=Float32Array.from(VSC), tok=++growTok;
+  // el final no depende de requestAnimationFrame (se pausa con la pestaña oculta): un temporizador lo asegura
+  const end=()=>{if(tok!==growTok)return;growTok++;VSC.set(to);markers.forEach((m,i)=>m.setRadius(rad(i)));orderBySize();placeRing()};
+  if(mqReduce.matches){end();return}
+  const t0=performance.now(), dur=700;VSC.fill(1);
+  const f=now=>{if(tok!==growTok)return;const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,3);
+    for(let i=0;i<VSC.length;i++)VSC[i]=1+(to[i]-1)*e;
+    shown.forEach(i=>markers[i].setRadius(rad(i)));
+    if(p<1)requestAnimationFrame(f);else end()};
+  requestAnimationFrame(f);setTimeout(end,dur+150);
 }
 // estrella: las TOP_N tiendas con más unidades en el mes en curso (del día 1 al último día con datos) de cada región
 let MES=null;
 const TOP_N=1, TOP=new Map(), TOPQ=new Map(), stars=new Map();
 const STAR_SVG='<svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg>';
 function buildTop(q){
+  stars.forEach(m=>m.remove());stars.clear();TOP.clear();TOPQ.clear();
   const seen=new Set(), byReg={};
   for(const i in q){const k=+i;if(!(M[k]&1)||M[k]&512||!q[i]||seen.has(SN[i]))continue;seen.add(SN[i]);(byReg[D[k][9]]=byReg[D[k][9]]||[]).push(k)}
   for(const r in byReg)byReg[r].sort((a,b)=>q[b]-q[a]).slice(0,TOP_N).forEach((i,n)=>{TOP.set(i,n+1);TOPQ.set(i,q[i])});
@@ -1504,6 +1543,8 @@ function fit(){
 const dist=(a,b,c,d)=>{const R=6371,p=Math.PI/180,x=(c-a)*p,y=(d-b)*p,h=Math.sin(x/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
 const kmTxt=k=>k<1?Math.round(k*1000)+' m':k<10?k.toFixed(1)+' km':fmt(Math.round(k))+' km';
 const kmOf=i=>S.me?dist(S.me[0],S.me[1],D[i][5],D[i][6]):null;
+// esqueleto animado mientras llega CAPA (misma forma que la tabla final)
+const capaSkel=()=>`<div class="skel" role="status"><span class="sr">${t('capaLoading')}</span><i class="sk-h"></i><i class="sk-l"></i><div class="sk-g"><i></i><i></i><i></i></div><i class="sk-l"></i><div class="sk-g sk-2"><i></i><i></i></div></div>`;
 function popupHTML(i){
   const r=D[i], m=M[i];
   const badges=TYPES.map((_,k)=>m&(1<<k)?`<span class="bdg${k===0?' bdg-store':''}">${esc(tn(k))}</span>`:'').join('');
@@ -1516,7 +1557,7 @@ function popupHTML(i){
 <h2>${esc(r[0])}</h2>
 <p class="pp-addr">${esc(r[1])}<br>${esc(r[2])}, ${esc(r[3])} · ${t('cp')} ${esc(r[4])}</p>
 ${tel?`<a class="pp-tel" href="tel:${esc(tel)}" aria-label="${esc(t('call',r[8]))}">${ICON.phone}${esc(r[8])}</a>`:''}${km!=null?`<span class="pp-km">${t('fromYou',kmTxt(km))}</span>`:''}
-${m&513?`<div class="pp-capa" data-i="${i}">${SN[i]?(capaCache.has(SN[i])?capaHTML(capaCache.get(SN[i])):`<span class="capa-msg">${t('capaLoading')}</span>`):`<span class="capa-msg">${t('capaNoMatch')}</span>`}</div>`:''}
+${m&513?`<div class="pp-capa" data-i="${i}">${SN[i]?(capaCache.has(SN[i])?capaHTML(capaCache.get(SN[i])):capaSkel()):`<span class="capa-msg">${t('capaNoMatch')}</span>`}</div>`:''}
 <div class="pp-act"><a class="btn pri" href="https://www.google.com/maps/dir/?api=1&destination=${ll}" target="_blank" rel="noopener">${ICON.route}${t('directions')}</a><button class="btn" type="button" data-copy="${esc(addr)}">${ICON.copy}${t('copyAddr')}</button></div>
 <div class="pp-foot">${off?`<a href="${esc(off)}" target="_blank" rel="noopener">${t('official')}</a>`:''}<a href="https://www.google.com/maps/search/?api=1&query=${ll}" target="_blank" rel="noopener">${t('gmaps')}</a><span class="coords">${r[5].toFixed(5)}, ${r[6].toFixed(5)}</span></div>
 </article>`;

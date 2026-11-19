@@ -88,18 +88,11 @@ GROUP BY c.num
 """
 MAX_SQL = """SELECT CONVERT(char(8), MAX(Date), 112) FROM [GTM BI Database].dbo.B2BHonorGeneralReport WITH (NOLOCK)
 WHERE Retail = 'Coppel' AND DATA_TYPE = 'SO'"""
-capa_cache = {}  # "36,1111" -> (expira, resultado)
-mx_cache = [0, None]  # [expira, último día con ventas]: recorrer la tabla para el MAX cuesta ~la mitad de cada consulta
 
 
 def cortes(cur):
-    """Último día con ventas (en caché 30 min), lunes de su semana ISO y día 1 de su mes."""
-    with lock:
-        exp, mx = mx_cache
-    if not mx or exp < time.time():
-        mx = datetime.datetime.strptime(cur.execute(MAX_SQL).fetchone()[0], "%Y%m%d").date()
-        with lock:
-            mx_cache[:] = [time.time() + 1800, mx]
+    """Último día con ventas, lunes de su semana ISO y día 1 de su mes."""
+    mx = datetime.datetime.strptime(cur.execute(MAX_SQL).fetchone()[0], "%Y%m%d").date()
     # weekday(): lunes=0 … domingo=6, así el domingo cae en la semana que termina (ISO)
     return mx, mx - datetime.timedelta(days=mx.weekday()), mx.replace(day=1)
 
@@ -117,83 +110,89 @@ def sql_conn_str():
     return s
 
 
-# Ventas de todas las tiendas: últimos 30 días (tamaño de los puntos) y mes en curso (estrella de la #1 por región)
-VENTAS_SQL = """
-SELECT c.num,
-       SUM(CASE WHEN r.Date > DATEADD(day, -30, m.mx) THEN r.Qty ELSE 0 END) qty,
-       SUM(CASE WHEN r.Date >= m.ms THEN r.Qty ELSE 0 END) mes
-FROM [GTM BI Database].dbo.B2BHonorGeneralReport r WITH (NOLOCK)
-JOIN (SELECT ID, LEFT([Coppel Name], CHARINDEX(' ', [Coppel Name] + ' ') - 1) num
-      FROM [GTM BI Database].dbo.CustomerStores_VW WHERE RetailName = 'COPPEL') c ON c.ID = r.ID
-CROSS JOIN (SELECT CONVERT(date, ?, 112) mx, CONVERT(date, ?, 112) ms) m
-WHERE r.Retail = 'Coppel' AND r.DATA_TYPE = 'SO' AND r.Date >= DATEADD(day, -31, m.mx)
-GROUP BY c.num
-"""
-ventas_cache = [0, None]  # [expira, resultado]
+# ── Precarga: la tabla de ventas no tiene índices y cada consulta la recorre completa (~8 s por tienda).
+# Consultar todas las tiendas juntas cuesta ~25 s, así que se hace una vez al arrancar y luego cada
+# REFRESH segundos en segundo plano; CAPA y /api/ventas responden desde memoria al instante.
+REFRESH = 1800
+snap = None                    # {"mx", "ws", "ms", "por_num": {num: fila}} de la última carga buena
+snap_err = None                # código del último error si todavía no hay ninguna carga buena
+snap_ready = threading.Event()  # se activa con la primera carga, buena o mala
 
 
-def ventas():
-    with lock:
-        exp, out = ventas_cache
-    if out and exp > time.time():
-        return out
+def cargar():
+    global snap, snap_err
     cs = sql_conn_str()
     if not cs:
-        return {"error": "Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt).", "code": "nosql"}
+        snap_err = "nosql"
+        return
     try:
         import pyodbc
         with pyodbc.connect(cs, timeout=10) as cn:
             cur = cn.cursor()
-            mx, _, ms = cortes(cur)
-            rows = cur.execute(VENTAS_SQL, [ymd(mx), ymd(ms)]).fetchall()
+            mx, ws, ms = cortes(cur)
+            rows = cur.execute(CAPA_SQL.format(filtro="1=1"), [ymd(mx), ymd(ws), ymd(ms)]).fetchall()
     except Exception:
-        return {"error": "No se pudo consultar SQL.", "code": "sql"}
-    ok = [r for r in rows if r.num and r.num.isdigit()]
-    out = {"hasta": mx.isoformat(), "ini_mes": ms.isoformat(), "dias": 30,
-           "t": {r.num: int(r.qty or 0) for r in ok}, "m": {r.num: int(r.mes or 0) for r in ok}}
+        snap_err = snap_err or "sql"   # si ya había datos se siguen usando los anteriores
+        return
+    por_num = {}
+    for r in rows:
+        if not (r.num and r.num.isdigit()):
+            continue
+        t = {"nombre": r.nombre.split(" ", 1)[1].lstrip("•· ").strip() if " " in r.nombre else ""}
+        for k in ("semana", "mes", "ano", "semana_cal", "mes_cal"):
+            t[k] = int(getattr(r, k) or 0)
+            t["h_" + k] = int(getattr(r, "h_" + k) or 0)
+        por_num[r.num] = t
     with lock:
-        ventas_cache[:] = [time.time() + 1800, out]
-    return out
+        snap = {"mx": mx, "ws": ws, "ms": ms, "por_num": por_num}
+        snap_err = None
+
+
+def precarga():
+    while True:
+        cargar()
+        snap_ready.set()
+        time.sleep(REFRESH)
+
+
+def datos():
+    """La carga más reciente; la primera vez espera a que termine (máx. 2 min)."""
+    snap_ready.wait(120)
+    with lock:
+        if snap:
+            return snap, None
+    msgs = {"nosql": "Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt).", "sql": "No se pudo consultar SQL."}
+    code = snap_err or "sql"
+    return None, {"error": msgs[code], "code": code}
+
+
+def ventas():
+    """Unidades por tienda: últimos 30 días (tamaño de los puntos) y mes en curso (estrella de la #1 por región)."""
+    d, err = datos()
+    if err:
+        return err
+    p = d["por_num"]
+    return {"hasta": d["mx"].isoformat(), "ini_mes": d["ms"].isoformat(), "dias": 30,
+            "t": {n: x["mes"] for n, x in p.items()}, "m": {n: x["mes_cal"] for n, x in p.items()}}
 
 
 def capa(t):
     nums = [n for n in t.split(",") if n.isdigit() and len(n) <= 5][:3]
     if not nums:
         return {"error": "Tienda no válida.", "code": "bad"}
-    key = ",".join(nums)
-    with lock:
-        hit = capa_cache.get(key)
-    if hit and hit[0] > time.time():
-        return hit[1]
-    cs = sql_conn_str()
-    if not cs:
-        return {"error": "Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt).", "code": "nosql"}
-    try:
-        import pyodbc
-        with pyodbc.connect(cs, timeout=10) as cn:
-            cur = cn.cursor()
-            mx, ws, ms = cortes(cur)
-            cur.execute(CAPA_SQL.format(filtro=" OR ".join(["[Coppel Name] LIKE ?"] * len(nums))),
-                        [n + " %" for n in nums] + [ymd(mx), ymd(ws), ymd(ms)])
-            rows = cur.fetchall()
-    except Exception:
-        return {"error": "No se pudo consultar SQL.", "code": "sql"}
-    by = {r.num: r for r in rows}
+    d, err = datos()
+    if err:
+        return err
+    p = d["por_num"]
     tiendas = []
     for n in nums:
-        r = by.get(n)
-        nombre = r.nombre.split(" ", 1)[1].lstrip("•· ").strip() if r and " " in r.nombre else ""
-        t = {"num": n, "nombre": nombre}
-        for k in ("semana", "mes", "ano", "semana_cal", "mes_cal"):
-            t[k] = int(getattr(r, k) or 0) if r else 0
-            t["h_" + k] = int(getattr(r, "h_" + k) or 0) if r else 0
-        tiendas.append(t)
-    # fechas en None si no hubo ventas en 365 días
+        x = p.get(n)
+        tiendas.append({"num": n, **(x or {"nombre": "", **{k: 0 for b in ("semana", "mes", "ano", "semana_cal", "mes_cal") for k in (b, "h_" + b)}})})
+    # fechas en None si ninguna tuvo ventas en 365 días
     out = {"tiendas": tiendas, "hasta": None, "ini_sem": None, "ini_mes": None, "isow": None}
-    if rows:
-        out.update(hasta=mx.isoformat(), ini_sem=ws.isoformat(), ini_mes=ms.isoformat(), isow=mx.isocalendar()[1])
-    with lock:
-        capa_cache[key] = (time.time() + 1800, out)
+    if any(n in p for n in nums):
+        mx = d["mx"]
+        out.update(hasta=mx.isoformat(), ini_sem=d["ws"].isoformat(), ini_mes=d["ms"].isoformat(), isow=mx.isocalendar()[1])
     return out
 
 
@@ -329,4 +328,5 @@ class Auth(SimpleHTTPRequestHandler):
 
 
 root, port = sys.argv[1], int(sys.argv[2])
+threading.Thread(target=precarga, daemon=True).start()
 ThreadingHTTPServer(("127.0.0.1", port), partial(Auth, directory=root)).serve_forever()
