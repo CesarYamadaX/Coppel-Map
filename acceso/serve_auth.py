@@ -149,20 +149,26 @@ def cargar():
 
 
 def precarga():
+    global snap_err
     while True:
-        cargar()
+        try:
+            cargar()
+        except Exception:      # un error inesperado no debe detener las recargas
+            snap_err = snap_err or "sql"
         snap_ready.set()
-        time.sleep(REFRESH)
+        # si todavía no hay datos (p. ej. SQL caído al arrancar) se reintenta en 1 min, no en 30
+        time.sleep(REFRESH if snap else 60)
 
 
 def datos():
     """La carga más reciente; la primera vez espera a que termine (máx. 2 min)."""
-    snap_ready.wait(120)
+    listo = snap_ready.wait(120)
     with lock:
         if snap:
             return snap, None
-    msgs = {"nosql": "Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt).", "sql": "No se pudo consultar SQL."}
-    code = snap_err or "sql"
+    msgs = {"nosql": "Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt).", "sql": "No se pudo consultar SQL.",
+            "loading": "Las ventas todavía se están cargando."}
+    code = snap_err or ("sql" if listo else "loading")
     return None, {"error": msgs[code], "code": code}
 
 

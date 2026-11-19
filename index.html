@@ -1271,7 +1271,7 @@ es:{loc:'es-MX',title:'Mapa de tiendas Coppel',mapAria:'Mapa de ubicaciones Copp
   capaLoading:'Cargando CAPA…',loadingSales:'Cargando ventas…',capaNoMatch:'Sin coincidencia en la base de ventas.',capaSub:'unidades vendidas y % Honor',capaMulti:'Varias tiendas con este nombre en el estado; revisa cuál es:',
   lastDaysH:'Últimos días',asOf:d=>`al ${d}`,last7:'Últimos 7 días',last30:'Últimos 30 días',last365:'Últimos 365 días',calH:'Calendario en curso',calSub:'semana lun–dom',weekN:n=>`Semana W${n}`,monthOf:m=>`Mes de ${m}`,
   honorTitle:(h,v)=>`${h} de ${v} unidades fueron Honor`,noSales365:'Sin ventas en los últimos 365 días.',
-  err_offline:'CAPA no disponible (abre el mapa desde el servidor con acceso a SQL).',err_bad:'Tienda no válida.',err_nosql:'Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt).',err_sql:'No se pudo consultar SQL.',
+  err_offline:'CAPA no disponible (abre el mapa desde el servidor con acceso a SQL).',err_bad:'Tienda no válida.',err_session:'Tu sesión expiró; recarga la página para volver a entrar.',err_loading:'Las ventas todavía se están cargando; vuelve a abrir la ficha en unos segundos.',err_nosql:'Falta la conexión a SQL (COPPEL_SQL o acceso/sql.txt).',err_sql:'No se pudo consultar SQL.',
   types:['Tiendas Coppel','Coppel Canadá','BanCoppel','Afore Coppel','Cajero','Motos','Bodega','Fashion Market','Otras','Sin ventas'],
   rnames:{1:'Baja California, BCS y San Luis Río Colorado',2:'Sonora y Sinaloa',3:'Chihuahua, Durango y La Laguna',4:'Nuevo León, Tamaulipas y Coahuila',5:'Jalisco, Colima, Michoacán y Nayarit',6:'Bajío y Centro-Norte',7:'Puebla, Veracruz, Oaxaca, Guerrero y Tlaxcala',8:'Sureste',9:'CDMX, Edo. de México, Hidalgo y Morelos'}},
 en:{loc:'en-US',title:'Coppel store map',mapAria:'Map of Coppel locations in Mexico',openPanel:'Show filters panel',filters:'Filters',panelAria:'Filters and results',grabAria:'Expand or collapse the panel',
@@ -1290,7 +1290,7 @@ en:{loc:'en-US',title:'Coppel store map',mapAria:'Map of Coppel locations in Mex
   capaLoading:'Loading CAPA…',loadingSales:'Loading sales…',capaNoMatch:'No match in the sales database.',capaSub:'units sold and Honor share',capaMulti:'Several stores share this name in the state; check which one it is:',
   lastDaysH:'Last days',asOf:d=>`as of ${d}`,last7:'Last 7 days',last30:'Last 30 days',last365:'Last 365 days',calH:'Current calendar',calSub:'week Mon–Sun',weekN:n=>`Week W${n}`,monthOf:m=>m[0].toUpperCase()+m.slice(1),
   honorTitle:(h,v)=>`${h} of ${v} units were Honor`,noSales365:'No sales in the last 365 days.',
-  err_offline:'CAPA unavailable (open the map from the server with SQL access).',err_bad:'Invalid store.',err_nosql:'SQL connection missing (COPPEL_SQL or acceso/sql.txt).',err_sql:'Could not query SQL.',
+  err_offline:'CAPA unavailable (open the map from the server with SQL access).',err_bad:'Invalid store.',err_session:'Your session expired; reload the page to sign in again.',err_loading:'Sales are still loading; reopen the card in a few seconds.',err_nosql:'SQL connection missing (COPPEL_SQL or acceso/sql.txt).',err_sql:'Could not query SQL.',
   types:['Coppel stores','Coppel Canadá','BanCoppel','Afore Coppel','ATM','Motorcycles','Warehouse','Fashion Market','Other','No sales'],
   rnames:{1:'Baja California, BCS and San Luis Río Colorado',2:'Sonora and Sinaloa',3:'Chihuahua, Durango and La Laguna',4:'Nuevo León, Tamaulipas and Coahuila',5:'Jalisco, Colima, Michoacán and Nayarit',6:'Bajío and North-Central',7:'Puebla, Veracruz, Oaxaca, Guerrero and Tlaxcala',8:'Southeast',9:'Mexico City, State of Mexico, Hidalgo and Morelos'}},
 zh:{loc:'zh-CN',title:'Coppel 门店地图',mapAria:'墨西哥 Coppel 网点地图',openPanel:'显示筛选面板',filters:'筛选',panelAria:'筛选与结果',grabAria:'展开或收起面板',
@@ -1309,7 +1309,7 @@ zh:{loc:'zh-CN',title:'Coppel 门店地图',mapAria:'墨西哥 Coppel 网点地�
   capaLoading:'正在加载 CAPA…',loadingSales:'正在加载销量…',capaNoMatch:'销售数据库中没有匹配的门店。',capaSub:'销量及 Honor 份额',capaMulti:'该州有多家同名门店，请确认是哪一家：',
   lastDaysH:'最近天数',asOf:d=>`截至 ${d}`,last7:'最近 7 天',last30:'最近 30 天',last365:'最近 365 天',calH:'当前日历周期',calSub:'周一至周日',weekN:n=>`第 ${n} 周 (W${n})`,monthOf:m=>m,
   honorTitle:(h,v)=>`${v} 台中有 ${h} 台为 Honor`,noSales365:'最近 365 天没有销售。',
-  err_offline:'CAPA 不可用（请通过可访问 SQL 的服务器打开地图）。',err_bad:'无效的门店。',err_nosql:'缺少 SQL 连接（COPPEL_SQL 或 acceso/sql.txt）。',err_sql:'无法查询 SQL。',
+  err_offline:'CAPA 不可用（请通过可访问 SQL 的服务器打开地图）。',err_bad:'无效的门店。',err_session:'会话已过期，请刷新页面重新登录。',err_loading:'销量数据仍在加载，请稍后重新打开。',err_nosql:'缺少 SQL 连接（COPPEL_SQL 或 acceso/sql.txt）。',err_sql:'无法查询 SQL。',
   types:['Coppel 门店','Coppel Canadá','BanCoppel','Afore Coppel','ATM','摩托车','仓库','Fashion Market','其他','无销售'],
   rnames:{1:'Baja California、BCS 和 San Luis Río Colorado',2:'Sonora 和 Sinaloa',3:'Chihuahua、Durango 和 La Laguna',4:'Nuevo León、Tamaulipas 和 Coahuila',5:'Jalisco、Colima、Michoacán 和 Nayarit',6:'Bajío 和中北部',7:'Puebla、Veracruz、Oaxaca、Guerrero 和 Tlaxcala',8:'东南部',9:'墨西哥城、墨西哥州、Hidalgo 和 Morelos'}}
 };
@@ -1447,7 +1447,7 @@ function loadVentas(){
     for(const i in q)if(!(M[i]&512))VSC[i]=.75+1.15*Math.sqrt(Math.min(q[i]/top,1));
     growMarkers();
     if(d.m){const qm={};for(const i in q)qm[i]=d.m[SN[i]]||0;MES=d.ini_mes&&d.hasta?[d.ini_mes,d.hasta]:null;buildTop(qm)}
-  }).catch(done);
+  }).catch(st=>{done();if(st===401)toast(t('err_session'))});
 }
 // los puntos pasan de su tamaño normal al tamaño por ventas con una transición corta
 let growTok=0;
@@ -1499,7 +1499,7 @@ const ringHalo=L.circleMarker([0,0],{renderer,interactive:false,fill:false,weigh
 const ring=L.circleMarker([0,0],{renderer,interactive:false,fill:false,weight:3,radius:12});
 function placeRing(){
   if(S.sel<0){ringHalo.remove();ring.remove();pulseRing();return}
-  const r=D[S.sel], ll=[r[5],r[6]], rr=rad(S.sel)+6;
+  const r=D[S.sel], ll=[r[5],r[6]], rr=Math.max(rad(S.sel)+6,stars.has(S.sel)&&map.hasLayer(stars.get(S.sel))?19:0); // la estrella mide 30 px
   ringHalo.setLatLng(ll).setRadius(rr).setStyle({color:isDark()?'#0b1220':'#ffffff'}).addTo(map).bringToFront();
   ring.setLatLng(ll).setRadius(rr).setStyle({color:css('--ring')}).addTo(map).bringToFront();
   pulseRing(ll,rr);
@@ -1586,7 +1586,7 @@ function loadCapa(i){
   fetch('api/capa?t='+encodeURIComponent(t),{credentials:'same-origin'})
     .then(r=>r.ok?r.json():Promise.reject(r.status))
     .then(put)
-    .catch(()=>put({error:true,code:'offline'}));
+    .catch(st=>put({error:true,code:st===401?'session':'offline'}));
 }
 function rowMatches(i){
   return !!(M[i]&typeMask())&&(!S.state||D[i][3]===S.state)&&(!S.region||D[i][9]===S.region)&&(!S.q.trim()||hay[i].includes(norm(S.q.trim())));
@@ -1697,7 +1697,7 @@ function renderStores(){
   if(!shown.length){el.innerHTML=`<div class="empty-state"><b>${t('noResults')}</b>${t('tryAgain')}</div>`;more.hidden=true;note.hidden=true;return}
   note.hidden=false;
   if(S.me){const dm=new Map(shown.map(i=>[i,kmOf(i)]));sorted=[...shown].sort((a,b)=>dm.get(a)-dm.get(b));note.innerHTML=ICON.near+esc(t('sortNear'))}
-  else{sorted=[...shown].sort((a,b)=>rank[a]-rank[b]);note.textContent=t('sortName')}
+  else{sorted=[...shown].sort((a,b)=>(TOP.has(b)-TOP.has(a))||rank[a]-rank[b]);note.textContent=t('sortName')} // la #1 del mes va primero
   const n=Math.min(S.limit,sorted.length);
   let h='';
   for(let j=0;j<n;j++){const i=sorted[j], r=D[i], km=S.me?kmOf(i):null;
