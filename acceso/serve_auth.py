@@ -141,7 +141,7 @@ def ventas():
             rows = cur.execute(VENTAS_SQL, [mx]).fetchall()
     except Exception:
         return {"error": "No se pudo consultar SQL.", "code": "sql"}
-    out = {"hasta": mx.isoformat(), "dias": 30, "t": {r.num: int(r.qty or 0) for r in rows if r.num.isdigit()}}
+    out = {"hasta": mx.isoformat(), "dias": 30, "t": {r.num: int(r.qty or 0) for r in rows if r.num and r.num.isdigit()}}
     with lock:
         ventas_cache[:] = [time.time() + 1800, out]
     return out

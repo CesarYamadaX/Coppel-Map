@@ -942,6 +942,7 @@ h1{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:-.01
 @keyframes panelIn{from{opacity:0;transform:translateX(-24px) scale(.98)}}
 @keyframes sheen{to{background-position:-200% 0}}
 .tabs{background:transparent}
+body:not(.leaflet-dragging) .leaflet-container.over-region{cursor:pointer}
 .tabs::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 
 .logo{background:var(--brand-grad);box-shadow:0 4px 14px rgba(255,190,0,.35),inset 0 -2px 0 rgba(18,38,79,.14);position:relative}
@@ -1228,7 +1229,7 @@ es:{loc:'es-MX',title:'Mapa de tiendas Coppel',mapAria:'Mapa de ubicaciones Copp
   src:'Coordenadas exactas del pin en el localizador oficial. Regiones según las 9 regiones celulares del IFT (las que usa Telcel); los municipios de excepción (La Laguna, San Luis Río Colorado y el norte de Jalisco) se asignan por tienda. Las sucursales y cajeros BanCoppel que la fuente trae sin tipo se clasifican por su nombre.',
   zoom:'Zoom',zin:'Acercar',zout:'Alejar',tools:'Herramientas del mapa',myLoc:'Mi ubicación',resetView:'Restablecer vista',themeTitle:'Cambiar tema',toLight:'Cambiar a modo claro',toDark:'Cambiar a modo oscuro',
   legend:'Leyenda',lgStore:'Tienda Coppel',lgNoSale:'Tienda sin ventas (ya no vende)',lgOther:'Otra ubicación (cajero, BanCoppel…)',lgMe:'Tu ubicación',cellRegions:'Regiones celulares (IFT)',
-  allStates:'Todos los estados',allRegions:'Todas',regionN:k=>`Región ${k}`,regionAria:(k,n)=>`Región ${k}: ${n}`,regionBadge:k=>`Región R${k}`,atLeastOne:'Debe quedar al menos un tipo activo',rnameAll:'Las 9 regiones celulares del IFT (las que usa Telcel).',
+  allStates:'Todos los estados',allRegions:'Todas',regionN:k=>`Región ${k}`,regionAria:(k,n)=>`Región ${k}: ${n}`,regionBadge:k=>`Región R${k}`,atLeastOne:'Debe quedar al menos un tipo activo',rnameAll:'Las 9 regiones celulares del IFT (las que usa Telcel). Da clic en un estado del mapa para filtrar su región.',
   wSearch:'búsqueda',wRegion:'región',wState:'estado',wTypes:'tipos',allTypes:'Todos los tipos',nTypes:n=>`${n} tipos`,removeFilter:(w,x)=>`Quitar filtro de ${w}: ${x}`,clearFilters:'Limpiar filtros',
   noResults:'Sin resultados',tryAgain:'Prueba con otra búsqueda o limpia los filtros.',sortNear:'Ordenadas por cercanía a tu ubicación',sortName:'Ordenadas por nombre. Usa «Mi ubicación» para ver las más cercanas.',
   filterByState:'Filtrar por estado',cp:'CP',noMatches:'Sin coincidencias para esa búsqueda.',copied:'Dirección copiada',copyFail:'No se pudo copiar la dirección',tilesFail:'No se pudo cargar el mapa de calles; se muestra el mapa simple.',
@@ -1247,7 +1248,7 @@ en:{loc:'en-US',title:'Coppel store map',mapAria:'Map of Coppel locations in Mex
   src:'Exact pin coordinates from the official store locator. Regions follow the 9 IFT mobile regions (the ones Telcel uses); exception municipalities (La Laguna, San Luis Río Colorado and northern Jalisco) are assigned per store. BanCoppel branches and ATMs that the source lists without a type are classified by name.',
   zoom:'Zoom',zin:'Zoom in',zout:'Zoom out',tools:'Map tools',myLoc:'My location',resetView:'Reset view',themeTitle:'Change theme',toLight:'Switch to light mode',toDark:'Switch to dark mode',
   legend:'Legend',lgStore:'Coppel store',lgNoSale:'Store with no sales (no longer selling)',lgOther:'Other location (ATM, BanCoppel…)',lgMe:'Your location',cellRegions:'Mobile regions (IFT)',
-  allStates:'All states',allRegions:'All',regionN:k=>`Region ${k}`,regionAria:(k,n)=>`Region ${k}: ${n}`,regionBadge:k=>`Region R${k}`,atLeastOne:'At least one type must stay selected',rnameAll:'The 9 IFT mobile regions (the ones Telcel uses).',
+  allStates:'All states',allRegions:'All',regionN:k=>`Region ${k}`,regionAria:(k,n)=>`Region ${k}: ${n}`,regionBadge:k=>`Region R${k}`,atLeastOne:'At least one type must stay selected',rnameAll:'The 9 IFT mobile regions (the ones Telcel uses). Click a state on the map to filter its region.',
   wSearch:'search',wRegion:'region',wState:'state',wTypes:'types',allTypes:'All types',nTypes:n=>`${n} types`,removeFilter:(w,x)=>`Remove ${w} filter: ${x}`,clearFilters:'Clear filters',
   noResults:'No results',tryAgain:'Try another search or clear the filters.',sortNear:'Sorted by distance from you',sortName:'Sorted by name. Use “My location” to see the closest ones.',
   filterByState:'Filter by state',cp:'ZIP',noMatches:'No matches for that search.',copied:'Address copied',copyFail:'Could not copy the address',tilesFail:'Could not load the street map; showing the simple map.',
@@ -1266,7 +1267,7 @@ zh:{loc:'zh-CN',title:'Coppel 门店地图',mapAria:'墨西哥 Coppel 网点地�
   src:'网点坐标来自官方门店定位器。大区按 IFT 的 9 个移动通信大区划分（Telcel 使用的划分）；例外城市（La Laguna、San Luis Río Colorado 和 Jalisco 北部）按门店单独划分。来源中未标注类型的 BanCoppel 分行和 ATM 按名称归类。',
   zoom:'缩放',zin:'放大',zout:'缩小',tools:'地图工具',myLoc:'我的位置',resetView:'重置视图',themeTitle:'切换主题',toLight:'切换到浅色模式',toDark:'切换到深色模式',
   legend:'图例',lgStore:'Coppel 门店',lgNoSale:'无销售门店（已停售）',lgOther:'其他网点（ATM、BanCoppel…）',lgMe:'你的位置',cellRegions:'移动通信大区（IFT）',
-  allStates:'所有州',allRegions:'全部',regionN:k=>`第 ${k} 大区`,regionAria:(k,n)=>`第 ${k} 大区：${n}`,regionBadge:k=>`R${k} 大区`,atLeastOne:'至少需要保留一种类型',rnameAll:'IFT 划分的 9 个移动通信大区（Telcel 使用的划分）。',
+  allStates:'所有州',allRegions:'全部',regionN:k=>`第 ${k} 大区`,regionAria:(k,n)=>`第 ${k} 大区：${n}`,regionBadge:k=>`R${k} 大区`,atLeastOne:'至少需要保留一种类型',rnameAll:'IFT 划分的 9 个移动通信大区（Telcel 使用的划分）。点击地图上的州即可筛选其大区。',
   wSearch:'搜索',wRegion:'大区',wState:'州',wTypes:'类型',allTypes:'所有类型',nTypes:n=>`${n} 种类型`,removeFilter:(w,x)=>`移除${w}筛选：${x}`,clearFilters:'清除筛选',
   noResults:'无结果',tryAgain:'请尝试其他搜索词或清除筛选。',sortNear:'按与你的距离排序',sortName:'按名称排序。点击“我的位置”查看最近的网点。',
   filterByState:'按州筛选',cp:'邮编',noMatches:'没有匹配的结果。',copied:'地址已复制',copyFail:'无法复制地址',tilesFail:'无法加载街道地图，已显示简易地图。',
@@ -1364,13 +1365,33 @@ const map=L.map('map',{preferCanvas:true,zoomSnap:.25,minZoom:4,maxZoom:18,zoomC
 L.control.attribution({prefix:false,position:'bottomright'}).addTo(map);
 const renderer=L.canvas({padding:.5,tolerance:L.Browser.touch?8:2});
 const stName=f=>FIX[f.properties.n]||f.properties.n;
+let hovReg=0; // región bajo el cursor
 function stStyle(f){
   const r=SR[stName(f)], on=S.color&&r, sel=S.region&&r===S.region, streets=S.base==='calles';
+  if(r&&r===hovReg&&!sel)return {color:RCOL[r],weight:2,opacity:1,fillColor:RCOL[r],fillOpacity:streets?.22:.5};
   if(streets)return {color:sel?RCOL[r]:css('--border'),weight:sel?2.5:1,opacity:sel?1:.7,fillColor:on?RCOL[r]:'#000',fillOpacity:on?(S.region&&!sel?.05:sel?.24:.18):0};
   return {color:css('--border'),weight:sel?2:1,opacity:1,fillColor:on?RCOL[r]:css('--land'),fillOpacity:on?(S.region&&!sel?.12:.34):1};
 }
 const stateLayer=L.geoJSON(STATES,{style:stStyle,interactive:false}).addTo(map);
 const MX=stateLayer.getBounds();
+// clic en un estado del mapa: filtra mapa y lista por su región (otro clic en la misma región la quita)
+const inRing=(x,y,r)=>{let c=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const[xi,yi]=r[i],[xj,yj]=r[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c};
+function regionAt(ll){
+  for(const f of STATES.features){const g=f.geometry,polys=g.type==='Polygon'?[g.coordinates]:g.coordinates;
+    for(const p of polys)if(inRing(ll.lng,ll.lat,p[0])&&!p.slice(1).some(h=>inRing(ll.lng,ll.lat,h)))return SR[stName(f)]||0}
+  return 0;
+}
+map.on('click',e=>{
+  if(performance.now()-popClosedAt<400||(isMobile()&&snap==='full'))return; // ese clic solo cerraba la ficha o bajaba la hoja
+  const r=regionAt(e.latlng);if(!r)return;
+  S.region=S.region===r?0:r;S.state='';update(true);
+  if(S.region){setTab('ubic');if(isMobile()&&snap==='collapsed')setSnap('half');
+    scrollEl.scrollTo({top:Math.max(0,$('pUbic').offsetTop-document.querySelector('.tabs').offsetHeight-8),behavior:mqReduce.matches?'auto':'smooth'})}
+});
+let hovRaf=0;
+const setHov=r=>{map.getContainer().classList.toggle('over-region',!!r);if(r===hovReg)return;hovReg=r;stateLayer.setStyle(stStyle)};
+map.on('mousemove',e=>{if(hovRaf)return;hovRaf=requestAnimationFrame(()=>{hovRaf=0;setHov(regionAt(e.latlng))})});
+map.on('mouseout',()=>{cancelAnimationFrame(hovRaf);hovRaf=0;setHov(0)});
 
 const mStyle=i=>{if(M[i]&512)return {color:css('--nosale'),fillColor:css('--nosale')};const s=M[i]&1;return {color:css(s?'--pin-edge':'--other'),fillColor:css(s?'--pin':'--other')}};
 const tier=z=>z>=14?3:z>=11?2:z>=7?1:0;
@@ -1386,9 +1407,10 @@ function loadVentas(){
     const vals=Object.values(q).filter(v=>v>0).sort((a,b)=>a-b);if(!vals.length)return;
     const top=vals[Math.floor(vals.length*.95)];
     for(const i in q)if(!(M[i]&512))VSC[i]=.75+1.15*Math.sqrt(Math.min(q[i]/top,1));
-    markers.forEach((m,i)=>m.setRadius(rad(i)));placeRing();
+    markers.forEach((m,i)=>m.setRadius(rad(i)));orderBySize();placeRing();
   }).catch(()=>{});
 }
+function orderBySize(){[...shown].sort((a,b)=>VSC[b]-VSC[a]).forEach(i=>markers[i].bringToFront());if(meDot)meDot.bringToFront()}
 const markers=D.map((r,i)=>{const m=L.circleMarker([r[5],r[6]],{renderer,radius:rad(i),weight:1,fillOpacity:.92,...mStyle(i)});m._i=i;return m});
 const group=L.featureGroup().addTo(map);
 const tip=L.tooltip({direction:'top',offset:[0,-6],opacity:1});
@@ -1422,7 +1444,8 @@ function pulseRing(ll,rr){
 let meDot=null, meAcc=null;
 
 const pop=L.popup({maxWidth:320,minWidth:230,autoPan:true,closeButton:true,offset:[0,-4]});
-map.on('popupclose',e=>{if(e.popup===pop&&!opening){S.sel=-1;placeRing();markActive()}});
+let popClosedAt=-1e9;
+map.on('popupclose',e=>{if(e.popup===pop&&!opening){popClosedAt=performance.now();S.sel=-1;placeRing();markActive()}});
 let opening=false;
 
 /* espacio libre del mapa (lo que no tapa el panel o la hoja) */
@@ -1633,6 +1656,7 @@ function update(doFit){
   const nv=new Uint8Array(D.length);next.forEach(i=>nv[i]=1);
   for(let i=0;i<D.length;i++){if(nv[i]===vis[i])continue;if(nv[i]){markers[i].setRadius(rad(i));group.addLayer(markers[i])}else group.removeLayer(markers[i]);vis[i]=nv[i]}
   shown=next;
+  if(next.some(i=>VSC[i]!==1))orderBySize();
   if(S.sel>=0&&!vis[S.sel]){map.closePopup(pop);S.sel=-1}
   placeRing();if(meDot)meDot.bringToFront();
   countTo($('count'),shown.length);$('openCount').textContent=fmt(shown.length);$('tabCount').textContent=fmt(shown.length);
