@@ -943,6 +943,18 @@ h1{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:-.01
 @keyframes sheen{to{background-position:-200% 0}}
 .tabs{background:transparent}
 body:not(.leaflet-dragging) .leaflet-container.over-region{cursor:pointer}
+.star-pin{filter:drop-shadow(0 0 1.5px #1a1200) drop-shadow(0 3px 4px rgba(0,0,0,.5));cursor:pointer} /* sin transform: Leaflet lo usa para posicionar */
+.star-pin svg{width:100%;height:100%;fill:#ffe14d;stroke:#fff;stroke-width:1.6;stroke-linejoin:round;transition:transform .25s var(--spring);animation:starIn .5s var(--spring) backwards}
+.star-pin:hover svg{transform:scale(1.18) rotate(-8deg)}
+.star-pin.r1 svg{animation:starIn .5s var(--spring) backwards,twinkle 2.6s ease-in-out .6s infinite}
+.star-pin b{position:absolute;inset:0;display:grid;place-items:center;padding-top:2px;font:700 9.5px var(--display);color:#3a2a00;pointer-events:none;animation:fadeIn .4s .25s backwards}
+.star-pin.r1 b{font-size:11px}
+@keyframes starIn{from{opacity:0;transform:scale(.3) rotate(-60deg)}}
+@keyframes twinkle{50%{filter:brightness(1.18) drop-shadow(0 0 6px rgba(255,213,0,.9))}}
+.lg-star{display:inline-block;width:13px;height:13px;margin-right:6px;vertical-align:-2px}
+.lg-star svg{width:100%;height:100%;fill:var(--brand);stroke:#7a5200;stroke-width:1.5}
+.tops{display:inline-block;margin-right:5px;padding:0 5px;border-radius:5px;font-size:10.5px;font-weight:700;vertical-align:1px;background:var(--brand-grad);color:var(--brand-ink)}
+.bdg.bdg-top{background:var(--brand-grad);color:var(--brand-ink);font-weight:700}
 .tabs::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 
 .logo{background:var(--brand-grad);box-shadow:0 4px 14px rgba(255,190,0,.35),inset 0 -2px 0 rgba(18,38,79,.14);position:relative}
@@ -1199,6 +1211,7 @@ h1{background:linear-gradient(90deg,var(--fg),var(--accent));-webkit-background-
     <span><span class="dot" style="background:var(--pin);box-shadow:0 0 0 1px var(--pin-edge)"></span><span data-i18n="lgStore">Tienda Coppel</span></span>
     <span><span class="dot" style="background:var(--nosale)"></span><span data-i18n="lgNoSale">Tienda sin ventas (ya no vende)</span></span>
     <span><span class="dot" style="background:var(--other)"></span><span data-i18n="lgOther">Otra ubicación (cajero, BanCoppel…)</span></span>
+    <span id="legendTop" hidden><span class="lg-star"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg></span><span data-i18n="lgTop">#1 en ventas del mes en su región</span></span>
     <span id="legendMe" hidden><span class="dot me"></span><span data-i18n="lgMe">Tu ubicación</span></span>
     <div class="rg" id="rgLegend"></div>
   </div>
@@ -1228,7 +1241,7 @@ es:{loc:'es-MX',title:'Mapa de tiendas Coppel',mapAria:'Mapa de ubicaciones Copp
   results:'Resultados',tabSummary:'Resumen',tabLocations:'Ubicaciones',groupAria:'Agrupar conteo',byState:'Por estado',byRegion:'Por región',countAria:'Conteo de ubicaciones',showMore:'Mostrar más',showMoreN:(n,m)=>`Mostrar más (${n} de ${m})`,
   src:'Coordenadas exactas del pin en el localizador oficial. Regiones según las 9 regiones celulares del IFT (las que usa Telcel); los municipios de excepción (La Laguna, San Luis Río Colorado y el norte de Jalisco) se asignan por tienda. Las sucursales y cajeros BanCoppel que la fuente trae sin tipo se clasifican por su nombre.',
   zoom:'Zoom',zin:'Acercar',zout:'Alejar',tools:'Herramientas del mapa',myLoc:'Mi ubicación',resetView:'Restablecer vista',themeTitle:'Cambiar tema',toLight:'Cambiar a modo claro',toDark:'Cambiar a modo oscuro',
-  legend:'Leyenda',lgStore:'Tienda Coppel',lgNoSale:'Tienda sin ventas (ya no vende)',lgOther:'Otra ubicación (cajero, BanCoppel…)',lgMe:'Tu ubicación',cellRegions:'Regiones celulares (IFT)',
+  legend:'Leyenda',lgStore:'Tienda Coppel',lgNoSale:'Tienda sin ventas (ya no vende)',lgOther:'Otra ubicación (cajero, BanCoppel…)',lgMe:'Tu ubicación',lgTop:'#1 en ventas del mes en su región',topBadge:(n,r)=>`#${n} del mes en R${r}`,topTitle:(n,r,u,p)=>`#${n} en ventas del mes en la región R${r}: ${u} unidades (${p})`,cellRegions:'Regiones celulares (IFT)',
   allStates:'Todos los estados',allRegions:'Todas',regionN:k=>`Región ${k}`,regionAria:(k,n)=>`Región ${k}: ${n}`,regionBadge:k=>`Región R${k}`,atLeastOne:'Debe quedar al menos un tipo activo',rnameAll:'Las 9 regiones celulares del IFT (las que usa Telcel). Da clic en un estado del mapa para filtrar su región.',
   wSearch:'búsqueda',wRegion:'región',wState:'estado',wTypes:'tipos',allTypes:'Todos los tipos',nTypes:n=>`${n} tipos`,removeFilter:(w,x)=>`Quitar filtro de ${w}: ${x}`,clearFilters:'Limpiar filtros',
   noResults:'Sin resultados',tryAgain:'Prueba con otra búsqueda o limpia los filtros.',sortNear:'Ordenadas por cercanía a tu ubicación',sortName:'Ordenadas por nombre. Usa «Mi ubicación» para ver las más cercanas.',
@@ -1247,7 +1260,7 @@ en:{loc:'en-US',title:'Coppel store map',mapAria:'Map of Coppel locations in Mex
   results:'Results',tabSummary:'Summary',tabLocations:'Locations',groupAria:'Group counts',byState:'By state',byRegion:'By region',countAria:'Location count',showMore:'Show more',showMoreN:(n,m)=>`Show more (${n} of ${m})`,
   src:'Exact pin coordinates from the official store locator. Regions follow the 9 IFT mobile regions (the ones Telcel uses); exception municipalities (La Laguna, San Luis Río Colorado and northern Jalisco) are assigned per store. BanCoppel branches and ATMs that the source lists without a type are classified by name.',
   zoom:'Zoom',zin:'Zoom in',zout:'Zoom out',tools:'Map tools',myLoc:'My location',resetView:'Reset view',themeTitle:'Change theme',toLight:'Switch to light mode',toDark:'Switch to dark mode',
-  legend:'Legend',lgStore:'Coppel store',lgNoSale:'Store with no sales (no longer selling)',lgOther:'Other location (ATM, BanCoppel…)',lgMe:'Your location',cellRegions:'Mobile regions (IFT)',
+  legend:'Legend',lgStore:'Coppel store',lgNoSale:'Store with no sales (no longer selling)',lgOther:'Other location (ATM, BanCoppel…)',lgMe:'Your location',lgTop:'#1 in sales this month in its region',topBadge:(n,r)=>`#${n} this month in R${r}`,topTitle:(n,r,u,p)=>`#${n} in sales this month in region R${r}: ${u} units (${p})`,cellRegions:'Mobile regions (IFT)',
   allStates:'All states',allRegions:'All',regionN:k=>`Region ${k}`,regionAria:(k,n)=>`Region ${k}: ${n}`,regionBadge:k=>`Region R${k}`,atLeastOne:'At least one type must stay selected',rnameAll:'The 9 IFT mobile regions (the ones Telcel uses). Click a state on the map to filter its region.',
   wSearch:'search',wRegion:'region',wState:'state',wTypes:'types',allTypes:'All types',nTypes:n=>`${n} types`,removeFilter:(w,x)=>`Remove ${w} filter: ${x}`,clearFilters:'Clear filters',
   noResults:'No results',tryAgain:'Try another search or clear the filters.',sortNear:'Sorted by distance from you',sortName:'Sorted by name. Use “My location” to see the closest ones.',
@@ -1266,7 +1279,7 @@ zh:{loc:'zh-CN',title:'Coppel 门店地图',mapAria:'墨西哥 Coppel 网点地�
   results:'结果',tabSummary:'汇总',tabLocations:'网点列表',groupAria:'分组统计',byState:'按州',byRegion:'按大区',countAria:'网点数量',showMore:'显示更多',showMoreN:(n,m)=>`显示更多（${n}/${m}）`,
   src:'网点坐标来自官方门店定位器。大区按 IFT 的 9 个移动通信大区划分（Telcel 使用的划分）；例外城市（La Laguna、San Luis Río Colorado 和 Jalisco 北部）按门店单独划分。来源中未标注类型的 BanCoppel 分行和 ATM 按名称归类。',
   zoom:'缩放',zin:'放大',zout:'缩小',tools:'地图工具',myLoc:'我的位置',resetView:'重置视图',themeTitle:'切换主题',toLight:'切换到浅色模式',toDark:'切换到深色模式',
-  legend:'图例',lgStore:'Coppel 门店',lgNoSale:'无销售门店（已停售）',lgOther:'其他网点（ATM、BanCoppel…）',lgMe:'你的位置',cellRegions:'移动通信大区（IFT）',
+  legend:'图例',lgStore:'Coppel 门店',lgNoSale:'无销售门店（已停售）',lgOther:'其他网点（ATM、BanCoppel…）',lgMe:'你的位置',lgTop:'本月所在大区销量第 1',topBadge:(n,r)=>`R${r} 本月第 ${n}`,topTitle:(n,r,u,p)=>`R${r} 大区本月销量第 ${n}：${u} 台（${p}）`,cellRegions:'移动通信大区（IFT）',
   allStates:'所有州',allRegions:'全部',regionN:k=>`第 ${k} 大区`,regionAria:(k,n)=>`第 ${k} 大区：${n}`,regionBadge:k=>`R${k} 大区`,atLeastOne:'至少需要保留一种类型',rnameAll:'IFT 划分的 9 个移动通信大区（Telcel 使用的划分）。点击地图上的州即可筛选其大区。',
   wSearch:'搜索',wRegion:'大区',wState:'州',wTypes:'类型',allTypes:'所有类型',nTypes:n=>`${n} 种类型`,removeFilter:(w,x)=>`移除${w}筛选：${x}`,clearFilters:'清除筛选',
   noResults:'无结果',tryAgain:'请尝试其他搜索词或清除筛选。',sortNear:'按与你的距离排序',sortName:'按名称排序。点击“我的位置”查看最近的网点。',
@@ -1397,19 +1410,42 @@ const mStyle=i=>{if(M[i]&512)return {color:css('--nosale'),fillColor:css('--nosa
 const tier=z=>z>=14?3:z>=11?2:z>=7?1:0;
 const RAD=[[4.4,3.4],[4.8,3.8],[6,5],[8,6.5]];
 let curTier=tier(map.getZoom());
-// tamaño por ventas: las tiendas con SN reciben un factor 0.75–1.9 según sus unidades de 30 días (raíz, tope en el percentil 95)
+// tamaño por ventas: las tiendas con SN de un solo número reciben un factor 0.75–1.9 según sus unidades de 30 días (raíz, tope en el percentil 95)
 const VSC=new Float32Array(D.length).fill(1);
 const rad=i=>RAD[curTier][M[i]&513?0:1]*VSC[i];
 function loadVentas(){
   fetch('api/ventas',{credentials:'same-origin'}).then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{
     if(!d||!d.t)return;
-    const q={};for(const i in SN)q[i]=SN[i].split(',').reduce((a,n)=>a+(d.t[n]||0),0);
+    // solo tiendas con número único: si el nombre coincide con varios números no se sabe cuál es (no se suman)
+    const q={};for(const i in SN)if(!SN[i].includes(','))q[i]=d.t[SN[i]]||0;
     const vals=Object.values(q).filter(v=>v>0).sort((a,b)=>a-b);if(!vals.length)return;
     const top=vals[Math.floor(vals.length*.95)];
     for(const i in q)if(!(M[i]&512))VSC[i]=.75+1.15*Math.sqrt(Math.min(q[i]/top,1));
     markers.forEach((m,i)=>m.setRadius(rad(i)));orderBySize();placeRing();
+    if(d.m){const qm={};for(const i in q)qm[i]=d.m[SN[i]]||0;MES=d.ini_mes&&d.hasta?[d.ini_mes,d.hasta]:null;buildTop(qm)}
   }).catch(()=>{});
 }
+// estrella: las TOP_N tiendas con más unidades en el mes en curso (del día 1 al último día con datos) de cada región
+let MES=null;
+const TOP_N=1, TOP=new Map(), TOPQ=new Map(), stars=new Map();
+const STAR_SVG='<svg viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/></svg>';
+function buildTop(q){
+  const seen=new Set(), byReg={};
+  for(const i in q){const k=+i;if(!(M[k]&1)||M[k]&512||!q[i]||seen.has(SN[i]))continue;seen.add(SN[i]);(byReg[D[k][9]]=byReg[D[k][9]]||[]).push(k)}
+  for(const r in byReg)byReg[r].sort((a,b)=>q[b]-q[a]).slice(0,TOP_N).forEach((i,n)=>{TOP.set(i,n+1);TOPQ.set(i,q[i])});
+  TOP.forEach((n,i)=>{
+    const sz=n===1?30:24;
+    const m=L.marker([D[i][5],D[i][6]],{icon:L.divIcon({className:'star-pin r'+n,html:STAR_SVG+'<b>'+n+'</b>',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]}),keyboard:false,riseOnHover:true,zIndexOffset:1000-n*10});
+    m.on('click',e=>{L.DomEvent.stopPropagation(e);select(i,false)});
+    m.bindTooltip(()=>esc(D[i][0])+' · ★ '+esc(t('topBadge',n,D[i][9]))+(MES?' · '+esc(mesRng()):''),{direction:'top',offset:[0,-sz/2]});
+    stars.set(i,m);
+  });
+  $('legendTop').hidden=!TOP.size;
+  syncStars();renderStores();
+  if(S.sel>=0&&map.hasLayer(pop))pop.setContent(popupHTML(S.sel));
+}
+const mesRng=()=>{const f=new Intl.DateTimeFormat(LOC(),{day:'numeric',month:'short'}),a=new Date(MES[0]+'T00:00:00'),b=new Date(MES[1]+'T00:00:00');try{return f.formatRange(a,b)}catch(e){return f.format(a)+'–'+f.format(b)}};
+function syncStars(){stars.forEach((m,i)=>{if(vis[i])m.addTo(map);else m.remove()})}
 function orderBySize(){[...shown].sort((a,b)=>VSC[b]-VSC[a]).forEach(i=>markers[i].bringToFront());if(meDot)meDot.bringToFront()}
 const markers=D.map((r,i)=>{const m=L.circleMarker([r[5],r[6]],{renderer,radius:rad(i),weight:1,fillOpacity:.92,...mStyle(i)});m._i=i;return m});
 const group=L.featureGroup().addTo(map);
@@ -1476,7 +1512,7 @@ function popupHTML(i){
   const addr=`${r[1]}, ${r[2]}, ${r[3]}, CP ${r[4]}`;
   const off=officialURL(i), km=kmOf(i);
   return `<article class="pp">
-<div class="pp-top"><span class="bdg rb" style="--c:${RCOL[r[9]]}" title="${esc(rn(r[9]))}">${t('regionBadge',r[9])}</span>${badges}</div>
+<div class="pp-top">${TOP.has(i)?`<span class="bdg bdg-top" title="${esc(t('topTitle',TOP.get(i),r[9],fmt(TOPQ.get(i)),MES?mesRng():''))}">★ ${t('topBadge',TOP.get(i),r[9])}</span>`:''}<span class="bdg rb" style="--c:${RCOL[r[9]]}" title="${esc(rn(r[9]))}">${t('regionBadge',r[9])}</span>${badges}</div>
 <h2>${esc(r[0])}</h2>
 <p class="pp-addr">${esc(r[1])}<br>${esc(r[2])}, ${esc(r[3])} · ${t('cp')} ${esc(r[4])}</p>
 ${tel?`<a class="pp-tel" href="tel:${esc(tel)}" aria-label="${esc(t('call',r[8]))}">${ICON.phone}${esc(r[8])}</a>`:''}${km!=null?`<span class="pp-km">${t('fromYou',kmTxt(km))}</span>`:''}
@@ -1624,7 +1660,7 @@ function renderStores(){
   const n=Math.min(S.limit,sorted.length);
   let h='';
   for(let j=0;j<n;j++){const i=sorted[j], r=D[i], km=S.me?kmOf(i):null;
-    h+=`<button type="button" class="store${i===S.sel?' on':''}" style="--i:${j}" data-i="${i}"><span class="d${M[i]&1?' s':M[i]&512?' n':''}"></span><span class="sn">${esc(r[0])}</span><span class="meta"><span class="rbadge" style="--c:${RCOL[r[9]]}">R${r[9]}</span>${km!=null?`<span class="km">${kmTxt(km)}</span>`:''}</span><span class="sa">${esc(r[1])} · ${esc(r[2])}, ${esc(r[3])}</span></button>`}
+    h+=`<button type="button" class="store${i===S.sel?' on':''}" style="--i:${j}" data-i="${i}"><span class="d${M[i]&1?' s':M[i]&512?' n':''}"></span><span class="sn">${TOP.has(i)?`<span class="tops" title="${esc(t('topBadge',TOP.get(i),r[9]))}">★${TOP.get(i)}</span>`:''}${esc(r[0])}</span><span class="meta"><span class="rbadge" style="--c:${RCOL[r[9]]}">R${r[9]}</span>${km!=null?`<span class="km">${kmTxt(km)}</span>`:''}</span><span class="sa">${esc(r[1])} · ${esc(r[2])}, ${esc(r[3])}</span></button>`}
   el.innerHTML=h;
   more.hidden=n>=sorted.length;
   if(!more.hidden)more.textContent=t('showMoreN',fmt(n),fmt(sorted.length));
@@ -1655,7 +1691,7 @@ function update(doFit){
   // solo se agregan o quitan los marcadores que cambian
   const nv=new Uint8Array(D.length);next.forEach(i=>nv[i]=1);
   for(let i=0;i<D.length;i++){if(nv[i]===vis[i])continue;if(nv[i]){markers[i].setRadius(rad(i));group.addLayer(markers[i])}else group.removeLayer(markers[i]);vis[i]=nv[i]}
-  shown=next;
+  shown=next;syncStars();
   if(next.some(i=>VSC[i]!==1))orderBySize();
   if(S.sel>=0&&!vis[S.sel]){map.closePopup(pop);S.sel=-1}
   placeRing();if(meDot)meDot.bringToFront();

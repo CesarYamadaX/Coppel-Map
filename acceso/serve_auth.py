@@ -80,12 +80,13 @@ FROM [GTM BI Database].dbo.B2BHonorGeneralReport r WITH (NOLOCK)
 JOIN (SELECT ID, [Coppel Name] nombre, LEFT([Coppel Name], CHARINDEX(' ', [Coppel Name] + ' ') - 1) num
       FROM [GTM BI Database].dbo.CustomerStores_VW
       WHERE RetailName = 'COPPEL' AND ({filtro})) c ON c.ID = r.ID
--- fechas de corte calculadas en Python (ver cortes()); se pasan como parámetros date
-CROSS JOIN (SELECT CAST(? AS date) mx, CAST(? AS date) ws, CAST(? AS date) ms) m
+-- fechas de corte calculadas en Python (ver cortes()); llegan como texto AAAAMMDD y se convierten con el
+-- estilo 112, que no depende del idioma de la sesión (en español '2026-11-12' se leería como 11 de diciembre)
+CROSS JOIN (SELECT CONVERT(date, ?, 112) mx, CONVERT(date, ?, 112) ws, CONVERT(date, ?, 112) ms) m
 WHERE r.Retail = 'Coppel' AND r.DATA_TYPE = 'SO' AND r.Date > DATEADD(day, -365, m.mx)
 GROUP BY c.num
 """
-MAX_SQL = """SELECT CAST(MAX(Date) AS date) FROM [GTM BI Database].dbo.B2BHonorGeneralReport WITH (NOLOCK)
+MAX_SQL = """SELECT CONVERT(char(8), MAX(Date), 112) FROM [GTM BI Database].dbo.B2BHonorGeneralReport WITH (NOLOCK)
 WHERE Retail = 'Coppel' AND DATA_TYPE = 'SO'"""
 capa_cache = {}  # "36,1111" -> (expira, resultado)
 mx_cache = [0, None]  # [expira, último día con ventas]: recorrer la tabla para el MAX cuesta ~la mitad de cada consulta
@@ -96,13 +97,16 @@ def cortes(cur):
     with lock:
         exp, mx = mx_cache
     if not mx or exp < time.time():
-        mx = cur.execute(MAX_SQL).fetchone()[0]
-        if isinstance(mx, str):
-            mx = datetime.date.fromisoformat(mx[:10])
+        mx = datetime.datetime.strptime(cur.execute(MAX_SQL).fetchone()[0], "%Y%m%d").date()
         with lock:
             mx_cache[:] = [time.time() + 1800, mx]
     # weekday(): lunes=0 … domingo=6, así el domingo cae en la semana que termina (ISO)
     return mx, mx - datetime.timedelta(days=mx.weekday()), mx.replace(day=1)
+
+
+def ymd(d):
+    """Fecha como texto AAAAMMDD, para CONVERT(date, ?, 112): igual con cualquier idioma, DATEFORMAT o driver."""
+    return d.strftime("%Y%m%d")
 
 
 def sql_conn_str():
@@ -113,13 +117,16 @@ def sql_conn_str():
     return s
 
 
-# Ventas de todas las tiendas en los últimos 30 días (para el tamaño de los puntos del mapa)
+# Ventas de todas las tiendas: últimos 30 días (tamaño de los puntos) y mes en curso (estrella de la #1 por región)
 VENTAS_SQL = """
-SELECT c.num, SUM(r.Qty) qty
+SELECT c.num,
+       SUM(CASE WHEN r.Date > DATEADD(day, -30, m.mx) THEN r.Qty ELSE 0 END) qty,
+       SUM(CASE WHEN r.Date >= m.ms THEN r.Qty ELSE 0 END) mes
 FROM [GTM BI Database].dbo.B2BHonorGeneralReport r WITH (NOLOCK)
 JOIN (SELECT ID, LEFT([Coppel Name], CHARINDEX(' ', [Coppel Name] + ' ') - 1) num
       FROM [GTM BI Database].dbo.CustomerStores_VW WHERE RetailName = 'COPPEL') c ON c.ID = r.ID
-WHERE r.Retail = 'Coppel' AND r.DATA_TYPE = 'SO' AND r.Date > DATEADD(day, -30, CAST(? AS date))
+CROSS JOIN (SELECT CONVERT(date, ?, 112) mx, CONVERT(date, ?, 112) ms) m
+WHERE r.Retail = 'Coppel' AND r.DATA_TYPE = 'SO' AND r.Date >= DATEADD(day, -31, m.mx)
 GROUP BY c.num
 """
 ventas_cache = [0, None]  # [expira, resultado]
@@ -137,11 +144,13 @@ def ventas():
         import pyodbc
         with pyodbc.connect(cs, timeout=10) as cn:
             cur = cn.cursor()
-            mx = cortes(cur)[0]
-            rows = cur.execute(VENTAS_SQL, [mx]).fetchall()
+            mx, _, ms = cortes(cur)
+            rows = cur.execute(VENTAS_SQL, [ymd(mx), ymd(ms)]).fetchall()
     except Exception:
         return {"error": "No se pudo consultar SQL.", "code": "sql"}
-    out = {"hasta": mx.isoformat(), "dias": 30, "t": {r.num: int(r.qty or 0) for r in rows if r.num and r.num.isdigit()}}
+    ok = [r for r in rows if r.num and r.num.isdigit()]
+    out = {"hasta": mx.isoformat(), "ini_mes": ms.isoformat(), "dias": 30,
+           "t": {r.num: int(r.qty or 0) for r in ok}, "m": {r.num: int(r.mes or 0) for r in ok}}
     with lock:
         ventas_cache[:] = [time.time() + 1800, out]
     return out
@@ -165,7 +174,7 @@ def capa(t):
             cur = cn.cursor()
             mx, ws, ms = cortes(cur)
             cur.execute(CAPA_SQL.format(filtro=" OR ".join(["[Coppel Name] LIKE ?"] * len(nums))),
-                        [n + " %" for n in nums] + [mx, ws, ms])
+                        [n + " %" for n in nums] + [ymd(mx), ymd(ws), ymd(ms)])
             rows = cur.fetchall()
     except Exception:
         return {"error": "No se pudo consultar SQL.", "code": "sql"}
