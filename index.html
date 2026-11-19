@@ -5,7 +5,8 @@
 <title>Mapa de tiendas Coppel</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" media="print" onload="this.media='all'">
 <style>
 /* required styles */
 
@@ -1037,6 +1038,20 @@ h1{background:linear-gradient(90deg,var(--fg),var(--accent));-webkit-background-
 .toast{background:var(--grad);color:var(--accent-fg);transform:translate(-50%,18px) scale(.9);transition:opacity .25s,transform .35s var(--spring)}
 .toast.show{transform:translate(-50%,0) scale(1)}
 
+/* Pantalla de carga inicial */
+#boot{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:radial-gradient(900px 600px at 20% 15%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 65%),radial-gradient(700px 500px at 85% 90%,color-mix(in srgb,var(--brand) 18%,transparent),transparent 65%),var(--bg);transition:opacity .45s var(--ease),visibility 0s .45s}
+#boot.done{opacity:0;visibility:hidden;pointer-events:none}
+.boot-in{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--fg);animation:fadeUp .5s var(--ease) backwards}
+.boot-in b{font-family:var(--display);font-size:22px;letter-spacing:-.01em}
+.boot-in #bootTxt{color:var(--muted);font-size:13px}
+.boot-logo{width:58px;height:58px;border-radius:17px;animation:bootBob 1.4s ease-in-out infinite}
+.boot-logo .ic{width:30px;height:30px}
+.boot-bar{width:160px;height:4px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:4px}
+.boot-bar i{display:block;width:40%;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--accent));animation:bootBar 1.1s ease-in-out infinite}
+@keyframes bootBob{50%{transform:translateY(-6px)}}
+@keyframes bootBar{from{transform:translateX(-110%)}to{transform:translateX(260%)}}
+.booting .panel,.booting .ctrls,.booting .legend,.booting .panel *{animation-play-state:paused}
+
 /* Carga: esqueleto de CAPA, aviso de ventas y barra del panel más rápida */
 .skel{display:flex;flex-direction:column;gap:7px}
 .skel i{display:block;border-radius:6px;background:linear-gradient(90deg,var(--line) 25%,color-mix(in srgb,var(--line) 40%,var(--panel)) 50%,var(--line) 75%);background-size:300% 100%;animation:shimmer 1.3s ease-in-out infinite}
@@ -1127,6 +1142,11 @@ h1{background:linear-gradient(90deg,var(--fg),var(--accent));-webkit-background-
 }
 </style>
 
+<div id="boot" role="status" aria-live="polite"><div class="boot-in"><span class="logo boot-logo" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span><b>Coppel Map</b><span id="bootTxt">Cargando mapa…</span><span class="boot-bar" aria-hidden="true"><i></i></span></div></div>
+<script>document.body.classList.add("booting");try{var bl=localStorage.getItem("coppel-map:lang");document.getElementById("bootTxt").textContent={en:"Loading map…",zh:"正在加载地图…"}[bl]||"Cargando mapa…"}catch(e){}
+// respaldo: si algo falla al iniciar, la pantalla de carga no se queda para siempre
+addEventListener("load",function(){setTimeout(function(){window.bootDone&&bootDone()},400)});
+function bootDone(){var b=document.getElementById("boot");document.body.classList.remove("booting");if(!b||b.classList.contains("done"))return;b.classList.add("done");setTimeout(function(){b.remove()},600)}</script>
 <div id="map" role="application" aria-label="Mapa de ubicaciones Coppel en México" data-i18n-aria="mapAria"></div>
 
 <div class="brand-pill float" aria-hidden="true">
@@ -1946,6 +1966,7 @@ setBase('simple',true);map.setMaxBounds(MX.pad(.25));
 update(false);
 fit();
 loadVentas();
+bootDone();
 function setLang(l){
   if(!I18N[l])return;LANG=l;store.set('lang',l);$('lang').value=l;
   applyStatic();fillStates();stEl.value=S.state;buildFilters();restyle();update(false);

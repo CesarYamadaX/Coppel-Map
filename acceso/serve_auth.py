@@ -1,4 +1,4 @@
-import base64, datetime, hashlib, hmac, html, json, os, secrets, struct, sys, threading, time
+import base64, datetime, email.utils, gzip, hashlib, hmac, html, json, os, secrets, struct, sys, threading, time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from functools import partial
 from urllib.parse import parse_qs
@@ -231,6 +231,9 @@ input:focus{outline:0;border-color:#7fb0ff;box-shadow:0 0 0 4px rgba(127,176,255
 form>button{background:linear-gradient(135deg,#0a4cad,#2f6fe0 60%%,#3d8bff);border-color:transparent;font-weight:600;cursor:pointer;box-shadow:0 10px 24px -10px rgba(47,111,224,.8)}
 form>button:hover{transform:translateY(-1px);filter:brightness(1.08)}
 form>button:active{transform:scale(.97)}
+form>button.busy{pointer-events:none;filter:saturate(.8)}
+form>button.busy::before{content:"";display:inline-block;width:14px;height:14px;margin:0 8px -2px 0;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 p{margin:0;color:#fca5a5;font-size:14px;padding:9px 12px;border-radius:10px;background:rgba(217,45,32,.12);border:1px solid rgba(255,107,94,.25);animation:shake .4s}
 @keyframes shake{25%%{transform:translateX(-6px)}50%%{transform:translateX(5px)}75%%{transform:translateX(-3px)}}
 small{color:#94a3b8;text-align:center}
@@ -249,9 +252,9 @@ small{color:#94a3b8;text-align:center}
 </form>
 <script>
 // misma preferencia que el mapa (coppel-map:lang), para que el idioma se conserve al entrar
-const T={es:{loc:"es-MX",user:"Usuario",code:"Código de 6 dígitos",enter:"Entrar",hint:"El código lo da tu app Authenticator.",err:"Usuario o código incorrectos."},
-en:{loc:"en-US",user:"Username",code:"6-digit code",enter:"Sign in",hint:"Get the code from your Authenticator app.",err:"Wrong username or code."},
-zh:{loc:"zh-CN",user:"用户名",code:"6 位验证码",enter:"登录",hint:"验证码来自你的 Authenticator 应用。",err:"用户名或验证码错误。"}};
+const T={es:{loc:"es-MX",user:"Usuario",code:"Código de 6 dígitos",enter:"Entrar",entering:"Entrando…",hint:"El código lo da tu app Authenticator.",err:"Usuario o código incorrectos."},
+en:{loc:"en-US",user:"Username",code:"6-digit code",enter:"Sign in",entering:"Signing in…",hint:"Get the code from your Authenticator app.",err:"Wrong username or code."},
+zh:{loc:"zh-CN",user:"用户名",code:"6 位验证码",enter:"登录",entering:"正在登录…",hint:"验证码来自你的 Authenticator 应用。",err:"用户名或验证码错误。"}};
 function setL(l){
   if(!T[l])l="es";try{localStorage.setItem("coppel-map:lang",l)}catch(e){}
   document.documentElement.lang=T[l].loc;
@@ -261,10 +264,88 @@ function setL(l){
 document.querySelector(".lg").addEventListener("click",e=>{const b=e.target.closest("[data-l]");if(b)setL(b.dataset.l)});
 let saved="es";try{saved=localStorage.getItem("coppel-map:lang")||"es"}catch(e){}
 setL(saved);
+// al enviar: indicador en el botón mientras el servidor responde y llega el mapa
+document.querySelector("form").addEventListener("submit",()=>{const b=document.querySelector("form>button");let l="es";try{l=localStorage.getItem("coppel-map:lang")||"es"}catch(e){}b.classList.add("busy");b.textContent=(T[l]||T.es).entering});
 </script>"""
 
 
+GZ_TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
+            ".json": "application/json; charset=utf-8", ".csv": "text/csv; charset=utf-8", ".svg": "image/svg+xml"}
+gz_cache = {}  # ruta -> (mtime, bytes comprimidos)
+
+
 class Auth(SimpleHTTPRequestHandler):
+    # HTTP/1.1 mantiene la conexión abierta entre peticiones (por el túnel cada conexión nueva cuesta ~0.5 s);
+    # todas las respuestas llevan Content-Length, que es lo que necesita
+    protocol_version = "HTTP/1.1"
+    timeout = 60  # una conexión inactiva se cierra al minuto
+
+    def gz(self, body):
+        """Comprime con gzip si el navegador lo acepta y vale la pena; devuelve (cuerpo, comprimido)."""
+        if len(body) > 1024 and "gzip" in self.headers.get("Accept-Encoding", ""):
+            return gzip.compress(body, 6), True
+        return body, False
+
+    def send_body(self, status, ctype, body, extra=()):
+        body, z = self.gz(body)
+        self.send_response(status)
+        self.send_header("Content-Type", ctype)
+        if z:
+            self.send_header("Content-Encoding", "gzip")
+        self.send_header("Vary", "Accept-Encoding")
+        if self.command == "POST":
+            self.send_header("Connection", "close")
+        for k, v in extra:
+            self.send_header(k, v)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(body)
+
+    def static_gz(self):
+        """Archivos de texto comprimidos (index.html: 578 KB -> ~170 KB) y revalidación con 304 al recargar."""
+        if "gzip" not in self.headers.get("Accept-Encoding", ""):
+            return False
+        path = self.translate_path(self.path)
+        if os.path.isdir(path):
+            if not self.path.split("?", 1)[0].endswith("/"):
+                return False          # la redirección a "carpeta/" la hace la clase base
+            path = os.path.join(path, "index.html")
+        ctype = GZ_TYPES.get(os.path.splitext(path)[1].lower())
+        if not ctype or not os.path.isfile(path):
+            return False
+        mtime = os.path.getmtime(path)
+        lastmod = email.utils.formatdate(mtime, usegmt=True)
+        ims = self.headers.get("If-Modified-Since")
+        if ims:
+            try:
+                if int(mtime) <= email.utils.parsedate_to_datetime(ims).timestamp():
+                    self.send_response(304)
+                    self.send_header("Last-Modified", lastmod)
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                    return True
+            except (TypeError, ValueError):
+                pass
+        with lock:
+            hit = gz_cache.get(path)
+        if not hit or hit[0] != mtime:
+            with open(path, "rb") as f:
+                hit = (mtime, gzip.compress(f.read(), 6))
+            with lock:
+                gz_cache[path] = hit
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Encoding", "gzip")
+        self.send_header("Vary", "Accept-Encoding")
+        self.send_header("Last-Modified", lastmod)
+        self.send_header("Cache-Control", "no-cache")  # el navegador guarda la copia y solo pregunta si cambió
+        self.send_header("Content-Length", str(len(hit[1])))
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(hit[1])
+        return True
+
     def authed(self):
         for part in self.headers.get("Cookie", "").split(";"):
             k, _, v = part.strip().partition("=")
@@ -275,20 +356,11 @@ class Auth(SimpleHTTPRequestHandler):
 
     def page(self, status, err=""):
         body = (PAGE % (f"<p data-t=err>{html.escape(err)}</p>" if err else "")).encode()
-        self.send_response(status)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        self.send_body(status, "text/html; charset=utf-8", body, [("Cache-Control", "no-store")])
 
     def json_out(self, obj):
         body = json.dumps(obj, ensure_ascii=False).encode()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Cache-Control", "no-store")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        self.send_body(200, "application/json; charset=utf-8", body, [("Cache-Control", "no-store")])
 
     def do_GET(self):
         p = self.path.split("?", 1)[0].lower()
@@ -307,12 +379,15 @@ class Auth(SimpleHTTPRequestHandler):
             self.end_headers()
             return
         if self.authed():
+            if self.static_gz():
+                return
             return super().do_GET()
         self.page(401)
 
     do_HEAD = do_GET
 
     def do_POST(self):
+        self.close_connection = True  # el cuerpo puede quedar sin leer: no reutilizar esta conexión
         if self.path != "/login":
             return self.page(401)
         n = min(int(self.headers.get("Content-Length", 0) or 0), 4096)
@@ -324,6 +399,7 @@ class Auth(SimpleHTTPRequestHandler):
             self.send_response(303)
             self.send_header("Set-Cookie", f"sid={tok}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age={SESSION_TTL}")
             self.send_header("Location", "/")
+            self.send_header("Connection", "close")
             self.send_header("Content-Length", "0")
             self.end_headers()
         else:
